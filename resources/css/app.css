@@ -1,0 +1,261 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source "../**/*.blade.php";
+@source "../**/*.js";
+@source "../**/*.vue";
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer components {
+/* container principal */
+    .main-container {
+    @apply flex flex-col h-screen bg-gray-100;
+   }
+
+ /****** Início Header ******/
+/* Estilização do Header */
+   .header{
+    @apply bg-yellow-300 text-red-600 p-4 w-full;
+   }
+
+   .content-header{
+    @apply max-w-6xl mx-auto flex items-center;
+   }
+
+   .title-logo{
+    @apply text-xl font-bold;
+   }
+
+   .list-nav-link{
+    @apply flex space-x-6 ml-6;
+   }
+
+   .nav-link{
+    @apply hover:text-gray-600 transition-colors;
+   }
+/****** Fim Header ******/
+
+/****** Início Conteúdo da Página ******/
+   .content{
+    @apply flex-1 px-2 py-6 max-w-6xl mx-auto w-full;
+   }
+
+   .content-title{
+    @apply flex justify-between items-center mb-6;
+   }
+
+   .page-title{
+    @apply text-2xl;
+   }
+/****** Fim Conteúdo da Página ******/
+
+/****** Início Botões ******/
+   .btn-yellow{
+    @apply bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded;
+   }
+   .btn-green{
+    @apply bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded;
+   }
+   .btn-blue{
+    @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+   }
+   .btn-red{
+    @apply bg-red-400 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors;
+   }
+ /****** Fim Botões ******/
+
+ /****** Início Formulário ******/
+   .form-container{
+    @apply mt-6 bg-white shadow-md rounded-lg p-6;
+   }
+   .form-label{
+    @apply block text-sm font-semibold;
+   }
+   .form-input{
+    @apply border p-2 w-full mt-1 rounded-md border-yellow-100 shadow-sm focus:border-yellow-300 focus:ring focus:ring-yellow-200 focus:outline-none;
+   }
+   .form-file{
+    @apply block w-full text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400;
+   }
+
+ /****** Fim Formulário ******/
+
+/****** Início Alertas ******/
+/* Alerta de sucesso */
+    .alert-success {
+        @apply p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-200 dark:bg-gray-800 dark:text-green-400;
+    }
+
+/* Alerta de erro */
+    .alert-error {
+        @apply p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-200 dark:bg-gray-800 dark:text-red-400;
+    }
+/****** Fim Alertas ******/
+
+/****** Início Tabela ******/
+.table-container {
+    @apply overflow-x-auto bg-white shadow-md rounded-lg;
+}
+
+.table {
+    @apply min-w-full border-collapse w-full;
+}
+
+.table-header {
+    @apply bg-yellow-300 text-red-600 uppercase text-sm leading-normal;
+}
+
+.table-header th {
+    @apply py-3 px-6 text-left;
+}
+
+.table-header .center {
+    @apply text-center;
+}
+.table-body {
+    @apply text-gray-700 text-sm font-light;
+}
+
+.table-row {
+    @apply border-b border-gray-200 hover:bg-blue-50 transition;
+}
+
+.table-cell {
+    @apply py-3 px-6;
+}
+
+.table-actions {
+    @apply py-3 px-6 text-center;
+}
+
+/****** Fim Tabela ******/
+
+/****** Início Paginação ******/
+.pagination {
+    @apply mt-2 p-3;
+}
+/****** Fim Paginação ******/
+
+/****** Início Dashboard Cards ******/
+.dashboard-card {
+    @apply bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-2 border-yellow-200 hover:border-yellow-400;
+}
+
+.dashboard-link {
+    @apply block p-6 text-center h-full flex flex-col items-center justify-center;
+}
+
+.dashboard-icon {
+    @apply text-red-600 mb-4 p-4 bg-yellow-100 rounded-full;
+}
+
+.dashboard-title {
+    @apply text-lg font-bold text-red-600 leading-tight;
+}
+
+.dashboard-card:hover .dashboard-icon {
+    @apply bg-yellow-200 transform scale-110 transition-all duration-300;
+}
+
+.dashboard-card:hover .dashboard-title {
+    @apply text-red-700;
+}
+/****** Fim Dashboard Cards ******/
+
+/****** Início Responsividade Mobile ******/
+@media (max-width: 768px) {
+    .content-header {
+        @apply flex-col space-y-4;
+    }
+
+    .list-nav-link {
+        @apply flex-col space-x-0 space-y-2 ml-0 w-full;
+    }
+
+    .dashboard-card {
+        @apply min-h-[120px];
+    }
+
+    .dashboard-title {
+        @apply text-base;
+    }
+
+    .dashboard-icon {
+        @apply p-3;
+    }
+
+    .dashboard-icon i {
+        @apply text-2xl;
+    }
+}
+
+@media (max-width: 640px) {
+    .content {
+        @apply px-4 py-4;
+    }
+
+    .dashboard-card {
+        @apply min-h-[100px];
+    }
+
+    .dashboard-link {
+        @apply p-4;
+    }
+
+    .dashboard-title {
+        @apply text-sm;
+    }
+
+    .dashboard-icon {
+        @apply p-2 mb-2;
+    }
+
+    .dashboard-icon i {
+        @apply text-xl;
+    }
+}
+/****** Fim Responsividade Mobile ******/
+
+/****** Início Melhorias Gerais ******/
+.form-container {
+    @apply mt-6 bg-white shadow-lg rounded-xl p-6 border border-yellow-200;
+}
+
+.form-input {
+    @apply border-2 p-3 w-full mt-1 rounded-lg border-yellow-200 shadow-sm focus:border-yellow-400 focus:ring focus:ring-yellow-200 focus:outline-none transition-colors;
+}
+
+.btn-yellow {
+    @apply bg-yellow-400 text-red-600 px-6 py-3 rounded-lg hover:bg-yellow-500 transition-all duration-300 font-semibold shadow-md hover:shadow-lg;
+}
+
+.btn-red {
+    @apply bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-300 font-semibold shadow-md hover:shadow-lg;
+}
+
+.table-container {
+    @apply overflow-x-auto bg-white shadow-lg rounded-xl border border-yellow-200;
+}
+
+.table-header {
+    @apply bg-gradient-to-r from-yellow-400 to-yellow-500 text-red-600 uppercase text-sm leading-normal;
+}
+
+.table-row:hover {
+    @apply bg-yellow-50 transition-colors;
+}
+
+.alert-success {
+    @apply p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100 border border-green-300 shadow-sm;
+}
+
+.alert-error {
+    @apply p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 border border-red-300 shadow-sm;
+}
+/****** Fim Melhorias Gerais ******/
+}
