@@ -36,7 +36,7 @@
    }
 
    .nav-link{
-    @apply hover:text-gray-600 transition-colors;
+    @apply hover:text-gray-600 transition-colors flex items-center;
    }
 /****** Fim Header ******/
 
@@ -166,6 +166,22 @@
     @apply text-red-700;
 }
 /****** Fim Dashboard Cards ******/
+
+/****** Início Dropdown Menu ******/
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* Estilos para os dropdowns do menu */
+.group:hover .hidden {
+    display: block;
+}
+
+/* Ajuste para o z-index dos dropdowns */
+.group {
+    position: relative;
+}
+/****** Fim Dropdown Menu ******/
 
 /****** Início Responsividade Mobile ******/
 @media (max-width: 768px) {

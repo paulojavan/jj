@@ -26,47 +26,144 @@
                         <span class="hidden sm:inline text-sm">Calçados</span>
                     </a>
                 </h2>
-                
+
                 <!-- Menu desktop -->
                 <nav class="hidden lg:flex list-nav-link">
-                    <li><a class="nav-link" href="{{ route('funcionario.cadastro') }}">
-                        <i class="fas fa-user-plus mr-1"></i>Funcionário
-                    </a></li>
-                    <li><a class="nav-link" href="{{ route('funcionario.index') }}">
-                        <i class="fas fa-users mr-1"></i>Listar
-                    </a></li>
-                    <li><a class="nav-link" href="{{ route('produtos.procurar') }}">
-                        <i class="fas fa-shoe-prints mr-1"></i>Produtos
-                    </a></li>
-                    <li><a class="nav-link relative" href="{{ route('carrinho.index') }}">
-                        <i class="fas fa-shopping-cart mr-1"></i>Carrinho
-                        @if(Session::has('carrinho') && count(Session::get('carrinho')) > 0)
-                            <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                {{ count(Session::get('carrinho')) }}
-                            </span>
-                        @endif
-                    </a></li>
-                    <li><a class="nav-link" href="{{ route('parcelas.index') }}">
-                        <i class="fas fa-file-invoice-dollar mr-1"></i>Parcelas
-                    </a></li>
-                    <li><a class="nav-link" href="{{ route('fluxo-caixa.index') }}">
-                        <i class="fas fa-cash-register mr-1"></i>Fluxo de Caixa
-                    </a></li>
-                    <li><a class="nav-link" href="{{ route('mensagens-aviso.index') }}">
-                        <i class="fas fa-bell mr-1"></i>Mensagens
-                    </a></li>
-                    <li><a class="nav-link" href="{{ route('baixa_fiscal.index') }}">
-                        <i class="fas fa-file-invoice mr-1"></i>Baixa Fiscal
-                    </a></li>
-                    @if(Auth::check() && (Auth::user()->nivel === 'admin' || Auth::user()->limite))
-                    <li><a class="nav-link" href="{{ route('verificacao-limite.index') }}">
-                        <i class="fas fa-credit-card mr-1"></i>Verificar Limite
-                    </a></li>
-                    @endif
+                    <!-- Funcionalidades Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center">
+                            <i class="fas fa-th-large mr-1"></i>Funcionalidades
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50 border border-yellow-200">
+                            <a href="{{ route('mensagens-aviso.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-bell mr-2"></i>Mensagens
+                            </a>
+                            <a href="{{ route('fluxo-caixa.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-cash-register mr-2"></i>Fluxo de Caixa
+                            </a>
+                            <a href="{{ route('carrinho.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100 relative">
+                                <i class="fas fa-shopping-cart mr-2"></i>Carrinho
+                                @if(Session::has('carrinho') && count(Session::get('carrinho')) > 0)
+                                    <span class="absolute top-1 right-3 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {{ count(Session::get('carrinho')) }}
+                                    </span>
+                                @endif
+                            </a>
+                            <a href="{{ route('baixa_fiscal.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-file-invoice mr-2"></i>Baixa Fiscal
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Funcionários Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center">
+                            <i class="fas fa-users mr-1"></i>Funcionários
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50 border border-yellow-200">
+                            <a href="{{ route('funcionario.cadastro') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-user-plus mr-2"></i>Cadastrar
+                            </a>
+                            <a href="{{ route('funcionario.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-list mr-2"></i>Listar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Clientes Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center">
+                            <i class="fas fa-user-friends mr-1"></i>Clientes
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50 border border-yellow-200">
+                            <a href="{{ route('clientes.create') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-user-plus mr-2"></i>Cadastrar
+                            </a>
+                            <a href="{{ route('clientes.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-address-book mr-2"></i>Listar
+                            </a>
+                            @if(Auth::check() && (Auth::user()->nivel === 'admin' || Auth::user()->limite))
+                            <a href="{{ route('verificacao-limite.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-credit-card mr-2"></i>Verificar Limite
+                            </a>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Produtos Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center">
+                            <i class="fas fa-shoe-prints mr-1"></i>Produtos
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50 border border-yellow-200">
+                            <a href="{{ route('produtos.procurar') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-search mr-2"></i>Buscar
+                            </a>
+                            <a href="{{ route('produtos.create') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-plus-circle mr-2"></i>Cadastrar
+                            </a>
+                            <a href="{{ route('produtos.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-boxes mr-2"></i>Listar
+                            </a>
+                            <a href="{{ route('marcas.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-tags mr-2"></i>Marcas
+                            </a>
+                            <a href="{{ route('grupos.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-layer-group mr-2"></i>Grupos
+                            </a>
+                            <a href="{{ route('subgrupos.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-sitemap mr-2"></i>Subgrupos
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Despesas Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center">
+                            <i class="fas fa-money-bill-wave mr-1"></i>Despesas
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50 border border-yellow-200">
+                            <a href="{{ route('despesas.create') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-file-invoice-dollar mr-2"></i>Cadastrar
+                            </a>
+                            <a href="{{ route('despesas.create.fixa') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-file-invoice mr-2"></i>Despesas Fixas
+                            </a>
+                            <a href="{{ route('despesas.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-search-dollar mr-2"></i>Verificar
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Configurações Dropdown -->
+                    <div class="relative group">
+                        <button class="nav-link flex items-center">
+                            <i class="fas fa-cogs mr-1"></i>Configurações
+                            <i class="fas fa-chevron-down text-xs ml-1"></i>
+                        </button>
+                        <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-50 border border-yellow-200">
+                            <a href="{{ route('horarios.edit') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-clock mr-2"></i>Horários
+                            </a>
+                            <a href="{{ route('descontos.edit', ['desconto' => 1]) }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-percentage mr-2"></i>Descontos
+                            </a>
+                            <a href="{{ route('multa-configuracao.edit') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>Multas e Juros
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Sair -->
                     <li>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="nav-link">
+                            <button type="submit" class="nav-link flex items-center">
                                 <i class="fas fa-sign-out-alt mr-1"></i>Sair
                             </button>
                         </form>
@@ -107,6 +204,12 @@
                     <a href="{{ route('fluxo-caixa.index') }}" class="block py-2 px-3 text-red-600 hover:bg-yellow-500 rounded">
                         <i class="fas fa-cash-register mr-2"></i>Fluxo de Caixa
                     </a>
+                    <a href="{{ route('despesas.create.fixa') }}" class="block py-2 px-3 text-red-600 hover:bg-yellow-500 rounded">
+                        <i class="fas fa-file-invoice mr-2"></i>Despesas Fixas
+                    </a>
+                    <a href="{{ route('despesas.index') }}" class="block py-2 px-3 text-red-600 hover:bg-yellow-500 rounded">
+                        <i class="fas fa-search-dollar mr-2"></i>Verificar Despesas
+                    </a>
                     <a href="{{ route('mensagens-aviso.index') }}" class="block py-2 px-3 text-red-600 hover:bg-yellow-500 rounded">
                         <i class="fas fa-bell mr-2"></i>Mensagens de Aviso
                     </a>
@@ -136,7 +239,7 @@
                 // Menu mobile toggle
                 const mobileMenuButton = document.getElementById('mobile-menu-button');
                 const mobileMenu = document.getElementById('mobile-menu');
-                
+
                 if (mobileMenuButton && mobileMenu) {
                     mobileMenuButton.addEventListener('click', function() {
                         mobileMenu.classList.toggle('hidden');
@@ -193,7 +296,7 @@
         </script>
 
     </div>
-    
+
     @stack('scripts')
     @yield('scripts')
 </body>

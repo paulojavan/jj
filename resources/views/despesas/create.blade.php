@@ -3,6 +3,14 @@
 @section('content')
 <div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Cadastrar Despesas</h1>
+    
+    <!-- Botão para acessar o cadastro de despesas fixas -->
+    <div class="mb-6">
+        <a href="{{ route('despesas.create.fixa') }}" class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 text-center block">
+            Cadastrar Despesa Fixa
+        </a>
+    </div>
+    
     <form method="POST" action="{{ route('despesas.store') }}">
         @csrf
         <div class="mb-4">
