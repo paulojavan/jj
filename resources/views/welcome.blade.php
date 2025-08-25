@@ -6,9 +6,9 @@
         <h1 class="text-3xl font-bold text-center text-red-600 mb-2">Dashboard - JJ Calçados</h1>
         <p class="text-center text-gray-600">Sistema de Gestão de Vendas</p>
     </div>
-    
+
     <x-alert />
-	
+
 
      <!-- Seção Funcionalidades -->
      <div class="mb-8">
@@ -109,6 +109,16 @@
                     <h3 class="dashboard-title">Listar<br>Clientes</h3>
                 </a>
             </div>
+
+            <div class="dashboard-card">
+                <a href="{{ route('verificacao-limite.index') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-credit-card mr-1"></i>
+                    </div>
+                    <h3 class="dashboard-title">Verificar<br>Limite</h3>
+                </a>
+            </div>
+
         </div>
     </div>
 
@@ -181,7 +191,24 @@
                     <h3 class="dashboard-title">Cadastrar<br>Despesa</h3>
                 </a>
             </div>
+            <div class="dashboard-card">
+                <a href="{{ route('despesas.create.fixa') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-file-invoice-dollar text-3xl"></i>
+                    </div>
+                    <h3 class="dashboard-title">Cadastrar<br>despesa fixa</h3>
+                </a>
+            </div>
+            <div class="dashboard-card">
+                <a href="{{ route('despesas.index') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-search-dollar mr-2"></i>
+                    </div>
+                    <h3 class="dashboard-title">Verificar<br>despesa</h3>
+                </a>
+            </div>
         </div>
+
     </div>
 
     <!-- Seção Configurações -->
@@ -237,7 +264,7 @@
             </div>
         </div>
     </div>
-    
+
 </div>
 
 @endsection

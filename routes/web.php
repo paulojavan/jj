@@ -106,6 +106,18 @@ Route::middleware(['auth'])->group(function () {
     // Rotas para Despesas
     Route::get('/despesas/create', [DespesaController::class, 'create'])->name('despesas.create');
     Route::post('/despesas', [DespesaController::class, 'store'])->name('despesas.store');
+    
+    // Rotas para Despesas Fixas
+    Route::get('/despesas/fixa/create', [DespesaController::class, 'createFixa'])->name('despesas.create.fixa');
+    Route::post('/despesas/fixa', [DespesaController::class, 'storeFixa'])->name('despesas.store.fixa');
+    Route::put('/despesas/fixa/{id}', [DespesaController::class, 'updateFixa'])->name('despesas.update.fixa');
+    Route::delete('/despesas/fixa/{id}', [DespesaController::class, 'destroyFixa'])->name('despesas.destroy.fixa');
+    
+    // Rotas para Verificação de Despesas
+    Route::get('/despesas', [DespesaController::class, 'index'])->name('despesas.index');
+    Route::post('/despesas/inserir-fixa', [DespesaController::class, 'inserirDespesaFixa'])->name('despesas.inserir.fixa');
+    Route::post('/despesas/atualizar', [DespesaController::class, 'atualizarDespesa'])->name('despesas.atualizar');
+    Route::post('/despesas/excluir', [DespesaController::class, 'excluirDespesa'])->name('despesas.excluir');
 
     // Rotas para Fluxo de Caixa
     Route::get('/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('fluxo-caixa.index');

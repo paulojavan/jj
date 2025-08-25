@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Models\Ticket;
 use App\Models\Parcela;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +19,11 @@ class ClienteProfileService
         try {
             $cliente = cliente::findOrFail($clienteId);
             
-            // Buscar todos os tickets do cliente
+            // Buscar todos os tickets do cliente, excluindo devoluções
             $tickets = Ticket::where('id_cliente', $clienteId)
+                ->whereDoesntHave('parcelasRelacao', function ($query) {
+                    $query->where('status', 'devolucao');
+                })
                 ->orderBy('data', 'asc')
                 ->get();
 
@@ -75,8 +78,10 @@ class ClienteProfileService
     private function analisarProdutosPreferidos($clienteId)
     {
         try {
-            // Buscar parcelas para determinar as tabelas de vendas
-            $parcelas = Parcela::where('id_cliente', $clienteId)->get();
+            // Buscar parcelas para determinar as tabelas de vendas, excluindo devoluções
+            $parcelas = Parcela::where('id_cliente', $clienteId)
+                ->where('status', '!=', 'devolucao')
+                ->get();
             
             $marcas = [];
             $grupos = [];
@@ -231,8 +236,9 @@ class ClienteProfileService
         try {
             $cliente = cliente::findOrFail($clienteId);
             
-            // Buscar todas as parcelas do cliente
+            // Buscar todas as parcelas do cliente, excluindo devoluções
             $parcelas = Parcela::where('id_cliente', $clienteId)
+                ->where('status', '!=', 'devolucao')
                 ->orderBy('data_vencimento', 'asc')
                 ->get();
 
@@ -316,7 +322,9 @@ class ClienteProfileService
     {
         $hoje = Carbon::now();
         $parcelasVencidas = $parcelas->filter(function ($parcela) use ($hoje) {
-            return Carbon::parse($parcela->data_vencimento)->lt($hoje) && is_null($parcela->data_pagamento);
+            return Carbon::parse($parcela->data_vencimento)->lt($hoje) 
+                && is_null($parcela->data_pagamento)
+                && $parcela->status !== 'devolucao';
         });
 
         $totalParcelas = $parcelas->count();
