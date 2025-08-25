@@ -295,18 +295,23 @@ class ClienteProfileService
             $vencimento = Carbon::parse($parcela->data_vencimento);
             $pagamento = Carbon::parse($parcela->data_pagamento);
             
-            $diasAtraso = $pagamento->diffInDays($vencimento, false);
-            
-            if ($diasAtraso <= 0) {
-                $pagamentosPontuais++;
-            } else {
+            // Calcular dias de atraso: positivo = atraso, negativo = antecipado
+            if ($pagamento->gt($vencimento)) {
+                // Pagamento após vencimento = atraso
+                $diasAtraso = $vencimento->diffInDays($pagamento);
                 $totalDiasAtraso += $diasAtraso;
                 $maiorAtraso = max($maiorAtraso, $diasAtraso);
+                $pagamentosAtrasados = ($pagamentosAtrasados ?? 0) + 1;
+            } else {
+                // Pagamento antes ou no vencimento = pontual
+                $pagamentosPontuais++;
             }
         }
+        
+        $pagamentosAtrasados = $pagamentosAtrasados ?? 0;
 
         $percentualPontual = ($pagamentosPontuais / $totalPagas) * 100;
-        $atrasoMedio = $totalPagas > $pagamentosPontuais ? $totalDiasAtraso / ($totalPagas - $pagamentosPontuais) : 0;
+        $atrasoMedio = $pagamentosAtrasados > 0 ? $totalDiasAtraso / $pagamentosAtrasados : 0;
 
         return [
             'percentual_pontual' => round($percentualPontual, 2),
