@@ -50,7 +50,13 @@
                                 <a href="{{ route('clientes.historico.pagamentos', $cliente->id) }}" class="btn-green block mt-2">
                                     <i class="fas fa-receipt mr-1"></i>Histórico pagamentos
                                 </a>
-                                <a href="{{ route('pagamentos.show', $cliente->id) }}" class="btn-yellow block mt-2">Pagar</a>
+                                @if($cliente->tem_tickets_negativados ?? false)
+                                    <a href="{{ route('pagamentos.show', $cliente->id) }}" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition duration-200 block mt-2 text-center">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>Negativado
+                                    </a>
+                                @else
+                                    <a href="{{ route('pagamentos.show', $cliente->id) }}" class="btn-yellow block mt-2">Pagar</a>
+                                @endif
                             </div>
                         </td>
                     </tr>
@@ -96,6 +102,13 @@
                     <a href="{{ route('clientes.historico.pagamentos', $cliente->id) }}" class="btn-green block w-full text-center mt-2">
                         <i class="fas fa-receipt mr-1"></i>Pagamentos
                     </a>
+                    @if($cliente->tem_tickets_negativados ?? false)
+                        <a href="{{ route('pagamentos.show', $cliente->id) }}" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition duration-200 block mt-2 text-center">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>Negativado
+                        </a>
+                    @else
+                        <a href="{{ route('pagamentos.show', $cliente->id) }}" class="btn-yellow block mt-2">Pagar</a>
+                    @endif
                 </div>
             </div>
         @empty

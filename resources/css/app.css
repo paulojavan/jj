@@ -208,6 +208,19 @@
     .dashboard-icon i {
         @apply text-2xl;
     }
+    
+    /* Estilos específicos para o menu mobile */
+    #mobile-menu .relative button {
+        @apply font-semibold;
+    }
+    
+    #mobile-menu .relative div a {
+        @apply pl-6;
+    }
+    
+    #mobile-menu .relative div {
+        @apply py-1;
+    }
 }
 
 @media (max-width: 640px) {

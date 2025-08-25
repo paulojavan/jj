@@ -119,6 +119,26 @@
                 </a>
             </div>
 
+            @if(Auth::check() && Auth::user()->nivel === 'administrador')
+            <div class="dashboard-card">
+                <a href="{{ route('negativacao.index') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-exclamation-triangle text-3xl"></i>
+                    </div>
+                    <h3 class="dashboard-title">Negativação<br>SPC</h3>
+                </a>
+            </div>
+
+            <div class="dashboard-card">
+                <a href="{{ route('negativacao.negativados') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-ban text-3xl"></i>
+                    </div>
+                    <h3 class="dashboard-title">Clientes<br>Negativados</h3>
+                </a>
+            </div>
+            @endif
+
         </div>
     </div>
 
@@ -210,6 +230,57 @@
         </div>
 
     </div>
+
+    @if(Auth::check() && Auth::user()->nivel === 'administrador')
+    <!-- Seção Administrativo -->
+    <div class="mb-8">
+        <div class="flex items-center mb-4">
+            <i class="fas fa-shield-alt text-red-600 text-2xl mr-3"></i>
+            <h2 class="text-2xl font-semibold text-red-600">Área Administrativa</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="dashboard-card border-2 border-red-300">
+                <a href="{{ route('negativacao.index') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+                    </div>
+                    <h3 class="dashboard-title text-red-600">Negativação<br>SPC</h3>
+                    <p class="text-xs text-gray-600 mt-1">Clientes para negativar</p>
+                </a>
+            </div>
+
+            <div class="dashboard-card border-2 border-red-300">
+                <a href="{{ route('negativacao.negativados') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-ban text-3xl text-red-600"></i>
+                    </div>
+                    <h3 class="dashboard-title text-red-600">Clientes<br>Negativados</h3>
+                    <p class="text-xs text-gray-600 mt-1">Gerenciar negativados</p>
+                </a>
+            </div>
+
+            <div class="dashboard-card border-2 border-yellow-300">
+                <a href="{{ route('verificacao-limite.index') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-credit-card text-3xl text-yellow-600"></i>
+                    </div>
+                    <h3 class="dashboard-title text-yellow-600">Verificar<br>Limite</h3>
+                    <p class="text-xs text-gray-600 mt-1">Gestão de limites</p>
+                </a>
+            </div>
+
+            <div class="dashboard-card border-2 border-blue-300">
+                <a href="{{ route('fluxo-caixa.index') }}" class="dashboard-link">
+                    <div class="dashboard-icon">
+                        <i class="fas fa-cash-register text-3xl text-blue-600"></i>
+                    </div>
+                    <h3 class="dashboard-title text-blue-600">Fluxo de<br>Caixa</h3>
+                    <p class="text-xs text-gray-600 mt-1">Relatórios financeiros</p>
+                </a>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Seção Configurações -->
     <div class="mb-8">

@@ -177,13 +177,13 @@
                     <div class="cedente">Cedente: JJ de B Pessoa ME</div>
                 </div>
                 <div class="cedente-info">
-                    <div class="cedente">Cedente: JJ de B Pessoa ME</div>
                     <div class="cliente-info">Cliente: {{ strtoupper($cliente->nome) }}</div>
                     <div class="cpf">Cpf: {{ $cliente->cpf }}</div>
-                    <div class="data-info">Data da emissão: {{ now()->format('d-m-Y') }} Vencimento: {{ $parcela->vencimento_formatado }}</div>
-                    <div class="valor-info">Valor da parcela: {{ number_format($parcela->valor_parcela, 2, ',', '.') }} Parcela: {{ $parcela->numero }}</div>
+                    <div class="data-info">Data da emissão: {{ now()->format('d-m-Y') }}<br> Vencimento: {{ $parcela->vencimento_formatado }}</div>
+                    <div class="valor-info">Valor da parcela: {{ number_format($parcela->valor_parcela, 2, ',', '.') }} <br>Parcela: {{ $parcela->numero }}</div>
                 </div>
             </div>
+            {{ $parcela->ticket }}
         </div>
     @endforeach
 </body>

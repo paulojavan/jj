@@ -19,6 +19,28 @@
 
     <x-alert />
 
+    @if(!empty($cliente->obs) && trim($cliente->obs) !== '')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Observação do Cliente',
+                    html: '<div class="text-left"><strong>{{ $cliente->nome }}</strong><br><br>{{ $cliente->obs }}</div>',
+                    icon: 'info',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3085d6',
+                    customClass: {
+                        popup: 'swal-wide'
+                    }
+                });
+            });
+        </script>
+        <style>
+            .swal-wide {
+                width: 600px !important;
+            }
+        </style>
+    @endif
+
     <form action="{{ route('clientes.update', ['cliente' => $cliente->id]) }}" method="post" enctype="multipart/form-data" class="form-container">
         @csrf
         @method('PUT')
@@ -239,7 +261,41 @@
         <div class="mb-4">
             <label class="form-label" for="obs">Observação:</label>
             <input class="form-input" type="text" name="obs" id="obs" placeholder="observação" value="{{ $cliente->obs }}" >
+        </div>
+
+        <!-- Informações de Limite -->
+        <div class="mb-4 p-4 bg-gray-50 rounded-lg border">
+            <h3 class="text-lg font-semibold text-gray-700 mb-3">
+                <i class="fas fa-credit-card mr-2"></i>Informações de Limite
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                    <label class="block text-sm font-medium text-blue-700 mb-1">
+                        <i class="fas fa-wallet mr-1"></i>Limite Total do Cliente
+                    </label>
+                    <div class="text-xl font-bold text-blue-800">
+                        R$ {{ number_format($cliente->limite_total_calculado ?? 0, 2, ',', '.') }}
+                    </div>
+                </div>
+                @php
+                    $limiteDisponivel = $cliente->limite_disponivel_calculado ?? 0;
+                    $isPositivo = $limiteDisponivel >= 0;
+                @endphp
+                <div class="{{ $isPositivo ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200' }} p-3 rounded-lg border">
+                    <label class="block text-sm font-medium {{ $isPositivo ? 'text-green-700' : 'text-red-700' }} mb-1">
+                        <i class="fas {{ $isPositivo ? 'fa-check-circle' : 'fa-exclamation-triangle' }} mr-1"></i>Limite Disponível
+                    </label>
+                    <div class="text-xl font-bold {{ $isPositivo ? 'text-green-800' : 'text-red-800' }}">
+                        R$ {{ number_format($limiteDisponivel, 2, ',', '.') }}
+                    </div>
+                    @if(!$isPositivo)
+                        <div class="text-xs text-red-600 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>Limite excedido
+                        </div>
+                    @endif
+                </div>
             </div>
+        </div>
 
         <div class="mb-4 text-center">
         <button class="btn-green" type="submit">Atualizar informações</button>

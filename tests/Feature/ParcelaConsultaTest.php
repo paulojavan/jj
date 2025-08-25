@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Models\Parcela;
 use App\Models\Autorizado;
 use App\Models\MultaConfiguracao;

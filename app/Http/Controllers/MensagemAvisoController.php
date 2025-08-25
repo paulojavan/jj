@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Parcela;
-use App\Models\cliente;
+use App\Models\Cliente;
 use Carbon\Carbon;
 
 class MensagemAvisoController extends Controller

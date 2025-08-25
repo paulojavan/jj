@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Services\ClienteProfileService;
 use App\Services\LimiteManagementService;
 use Illuminate\Http\Request;
@@ -98,10 +98,10 @@ class VerificacaoLimiteController extends Controller
                 'apelido' => $cliente->apelido,
                 'rg' => $cliente->rg,
                 'cpf' => $this->formatarCpf($cliente->cpf),
-                'renda' => $cliente->renda ? 'R$ ' . number_format($cliente->renda, 2, ',', '.') : 'Não informado',
+                'renda' => $cliente->renda ? 'R$ ' . number_format($this->toFloat($cliente->renda), 2, ',', '.') : 'Não informado',
                 'status' => $cliente->status,
-                'limite_atual' => $cliente->limite ? number_format($cliente->limite, 2, ',', '.') : '0,00',
-                'limite_atual_numerico' => $cliente->limite ?? 0,
+                'limite_atual' => $cliente->limite ? number_format($this->toFloat($cliente->limite), 2, ',', '.') : '0,00',
+                'limite_atual_numerico' => $this->toFloat($cliente->limite ?? 0),
                 'foto' => $cliente->foto,
                 'pasta' => $cliente->pasta,
                 'referencias_comerciais' => [
@@ -186,7 +186,7 @@ class VerificacaoLimiteController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $resultado['message'],
-                    'limite_formatado' => number_format($novoLimite, 2, ',', '.'),
+                    'limite_formatado' => number_format($this->toFloat($novoLimite), 2, ',', '.'),
                     'limite_numerico' => $novoLimite
                 ]);
             } else {
@@ -288,5 +288,39 @@ class VerificacaoLimiteController extends Controller
                 'message' => 'Erro ao carregar histórico: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Converte valor para float de forma segura
+     */
+    private function toFloat($value)
+    {
+        if (is_null($value) || $value === '') {
+            return 0.0;
+        }
+        
+        // Se já é numérico, converte diretamente
+        if (is_numeric($value)) {
+            return (float) $value;
+        }
+        
+        // Se é string, tenta limpar e converter
+        if (is_string($value)) {
+            // Remove caracteres não numéricos exceto vírgula e ponto
+            $cleaned = preg_replace('/[^\d,.-]/', '', $value);
+            
+            // Substitui vírgula por ponto para conversão
+            $cleaned = str_replace(',', '.', $cleaned);
+            
+            // Se ainda não é numérico após limpeza, retorna 0
+            if (!is_numeric($cleaned)) {
+                return 0.0;
+            }
+            
+            return (float) $cleaned;
+        }
+        
+        // Para outros tipos, tenta conversão direta ou retorna 0
+        return is_numeric($value) ? (float) $value : 0.0;
     }
 }

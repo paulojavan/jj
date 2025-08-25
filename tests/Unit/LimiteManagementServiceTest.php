@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\LimiteManagementService;
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Models\User;
 use App\Models\LimiteLog;
 use Illuminate\Foundation\Testing\RefreshDatabase;

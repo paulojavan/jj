@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Models\Ticket;
 use App\Models\Parcela;
 use App\Models\Pagamento;
@@ -37,6 +37,11 @@ class ClienteController extends Controller
                 });
             }
             $clientes = $query->orderBy('nome', 'asc')->paginate(10);
+            
+            // Verificar se cada cliente tem tickets negativados
+            foreach ($clientes as $cliente) {
+                $cliente->tem_tickets_negativados = $cliente->tickets()->where('spc', true)->exists();
+            }
         }
 
         return view('cliente.index', ['clientes' => $clientes]);
@@ -150,6 +155,21 @@ class ClienteController extends Controller
     {
         // Carrega os autorizados relacionados ao cliente
         $cliente->load('autorizados');
+        
+        // Calcular limite disponível
+        $limiteTotal = $cliente->limite ?? 0;
+        
+        // Somar parcelas com status "aguardando pagamento"
+        $valorParcelasAguardando = $cliente->parcelas()
+            ->where('status', 'aguardando pagamento')
+            ->sum('valor_parcela');
+            
+        $limiteDisponivel = $limiteTotal - $valorParcelasAguardando;
+        
+        // Adicionar as informações calculadas ao cliente
+        $cliente->limite_total_calculado = $limiteTotal;
+        $cliente->limite_disponivel_calculado = $limiteDisponivel;
+        
         return view('cliente.edit', compact('cliente'));
     }
 
@@ -365,7 +385,7 @@ class ClienteController extends Controller
             // Buscar tickets com paginação (20 por página)
             $tickets = Ticket::where('id_cliente', $id)
                 ->with(['parcelasRelacao' => function($query) {
-                    $query->orderBy('numero', 'asc');
+                    $query->orderBy('data_vencimento', 'asc');
                 }])
                 ->orderBy('data', 'desc')
                 ->paginate(20);
@@ -393,7 +413,7 @@ class ClienteController extends Controller
             // Buscar pagamentos do cliente
             $pagamentos = Pagamento::where('id_cliente', $id)
                 ->with(['parcelas' => function($query) {
-                    $query->orderBy('numero', 'asc');
+                    $query->orderBy('data_vencimento', 'asc');
                 }])
                 ->orderBy('data', 'desc')
                 ->get();
@@ -417,7 +437,7 @@ class ClienteController extends Controller
             $ticketData = Ticket::where('id_cliente', $id)
                 ->where('ticket', $ticket)
                 ->with(['parcelasRelacao' => function($query) {
-                    $query->orderBy('numero', 'asc');
+                    $query->orderBy('data_vencimento', 'asc');
                 }])
                 ->firstOrFail();
 
@@ -443,7 +463,7 @@ class ClienteController extends Controller
             $ticketData = Ticket::where('id_cliente', $id)
                 ->where('ticket', $ticket)
                 ->with(['parcelasRelacao' => function($query) {
-                    $query->orderBy('numero', 'asc');
+                    $query->orderBy('data_vencimento', 'asc');
                 }])
                 ->firstOrFail();
 
@@ -469,7 +489,7 @@ class ClienteController extends Controller
             $ticketData = Ticket::where('id_cliente', $id)
                 ->where('ticket', $ticket)
                 ->with(['parcelasRelacao' => function($query) {
-                    $query->orderBy('numero', 'asc');
+                    $query->orderBy('data_vencimento', 'asc');
                 }])
                 ->firstOrFail();
 

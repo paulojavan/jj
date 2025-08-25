@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Models\LimiteLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;

@@ -138,6 +138,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/alterar-status/{id}', [VerificacaoLimiteController::class, 'alterarStatus'])->name('alterar-status');
         Route::get('/historico-alteracoes/{id}', [VerificacaoLimiteController::class, 'historicoAlteracoes'])->name('historico-alteracoes');
     });
+
+    // Rotas para Negativação de Clientes (apenas administradores)
+    Route::middleware(['admin'])->prefix('negativacao')->name('negativacao.')->group(function () {
+        Route::get('/', [App\Http\Controllers\NegativacaoController::class, 'index'])->name('index');
+        Route::get('/cliente/{cliente}', [App\Http\Controllers\NegativacaoController::class, 'show'])->name('show');
+        Route::post('/negativar/{cliente}', [App\Http\Controllers\NegativacaoController::class, 'negativar'])->name('negativar');
+        Route::get('/negativados', [App\Http\Controllers\NegativacaoController::class, 'negativados'])->name('negativados');
+        Route::get('/negativado/{cliente}', [App\Http\Controllers\NegativacaoController::class, 'showNegativado'])->name('show-negativado');
+        Route::post('/retornar-parcelas/{cliente}', [App\Http\Controllers\NegativacaoController::class, 'retornarParcelas'])->name('retornar-parcelas');
+        Route::post('/remover/{cliente}', [App\Http\Controllers\NegativacaoController::class, 'removerNegativacao'])->name('remover');
+    });
     
     // Rotas para produtos (protegidas por middleware)
     Route::middleware(['check.product.access'])->group(function () {

@@ -4,7 +4,7 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 use App\Services\ClienteProfileService;
-use App\Models\cliente;
+use App\Models\Cliente;
 use App\Models\Ticket;
 use App\Models\Parcela;
 use Illuminate\Foundation\Testing\RefreshDatabase;

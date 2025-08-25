@@ -49,6 +49,16 @@
                 </script>
             @endif
 
+            <!-- Botões de Seleção -->
+            <div class="mb-6 flex gap-4 justify-center">
+                <button type="button" id="btn-selecionar-todas" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                    <i class="fas fa-check-square mr-2"></i>Selecionar Todas
+                </button>
+                <button type="button" id="btn-desselecionar-todas" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition duration-200">
+                    <i class="fas fa-square mr-2"></i>Desselecionar Todas
+                </button>
+            </div>
+
             <form action="{{ route('pagamentos.store', $cliente) }}" method="POST" id="payment-form">
                 @csrf
                 <div class="mb-6">
@@ -144,6 +154,18 @@
 
             $('.parcela-checkbox').on('change', updateTotal);
             $('#dinheiro, #pix, #cartao').on('input', checkPaymentAbility);
+
+            // Botões de seleção
+            $('#btn-selecionar-todas').on('click', function() {
+                $('.parcela-checkbox').prop('checked', true);
+                updateTotal();
+            });
+
+            $('#btn-desselecionar-todas').on('click', function() {
+                $('.parcela-checkbox').prop('checked', false);
+                updateTotal();
+                clearPayments();
+            });
             
             // Intercept form submission to show confirmation
             $('#payment-form').on('submit', function(e) {
