@@ -1,6 +1,6 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-CaKZdF9d.css",
+    "file": "assets/app--9tWBFQc.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
@@ -8,6 +8,12 @@
     "file": "assets/app-BSzPpa-f.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/sweetalert-config.js": {
+    "file": "assets/sweetalert-config-DnbMTx4e.js",
+    "name": "sweetalert-config",
+    "src": "resources/js/sweetalert-config.js",
     "isEntry": true
   }
 }
