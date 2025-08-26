@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'check.product.access' => \App\Http\Middleware\CheckProductAccess::class,
             'verificacao.limite' => \App\Http\Middleware\VerificacaoLimiteMiddleware::class,
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'rate.limit.mensagens' => \App\Http\Middleware\RateLimitMensagensOciosos::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

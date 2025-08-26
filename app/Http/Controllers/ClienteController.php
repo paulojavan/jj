@@ -802,4 +802,126 @@ class ClienteController extends Controller
         }
     }
 
+    /**
+     * Exibe lista de clientes ociosos
+     */
+    public function clientesOciosos(Request $request)
+    {
+        try {
+            // Query para buscar clientes ociosos
+            $query = Cliente::select(['id', 'nome', 'cpf', 'telefone', 'ociosidade', 'status'])
+                ->whereNotNull('ociosidade')
+                ->whereRaw('DATEDIFF(CURDATE(), ociosidade) >= 150')
+                ->whereDoesntHave('tickets', function($query) {
+                    $query->where('spc', true);
+                })
+                ->where('status', '!=', 'inativo')
+                ->orderBy('ociosidade', 'asc');
+
+            // Aplicar paginação
+            $clientes = $query->paginate(20);
+
+            // Calcular dias de ociosidade para cada cliente
+            foreach ($clientes as $cliente) {
+                if ($cliente->ociosidade) {
+                    $cliente->dias_ociosos = Carbon::parse($cliente->ociosidade)->diffInDays(Carbon::now());
+                } else {
+                    $cliente->dias_ociosos = 0;
+                }
+            }
+
+            return view('cliente.ociosos', compact('clientes'));
+
+        } catch (Exception $e) {
+            \Log::error('Erro ao carregar clientes ociosos: ' . $e->getMessage());
+            return redirect()->route('clientes.index')
+                ->with('error', 'Erro ao carregar lista de clientes ociosos: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Envia mensagem WhatsApp para cliente ocioso
+     */
+    public function enviarMensagemOcioso($id)
+    {
+        try {
+            $cliente = Cliente::findOrFail($id);
+
+            // Validar se cliente possui telefone
+            if (empty($cliente->telefone)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cliente não possui número de telefone cadastrado.'
+                ], 400);
+            }
+
+            // Validar se cliente ainda está ocioso (150+ dias)
+            if ($cliente->ociosidade) {
+                $diasOciosos = Carbon::parse($cliente->ociosidade)->diffInDays(Carbon::now());
+                if ($diasOciosos < 150) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cliente não atende mais aos critérios de ociosidade.'
+                    ], 400);
+                }
+            }
+
+            // Extrair nomes usando método auxiliar
+            $doisPrimeirosNomes = $this->extrairPrimeirosNomes($cliente->nome);
+
+            // Formatar número do telefone
+            $telefone = preg_replace('/[^0-9]/', '', $cliente->telefone);
+            if (!str_starts_with($telefone, '55')) {
+                $telefone = '55' . $telefone;
+            }
+
+            // Gerar mensagem personalizada
+            $mensagem = "Bom dia, {$doisPrimeirosNomes}, tudo bem com você? Estamos sentindo sua falta, notamos sua ausência de nossa loja nos últimos tempos. Confira nossas novidades no instagram @joecio_calcados. Você é um cliente especial para nós. Seu crediário continua ativo, esperamos por o seu retorno em uma de nossas lojas, estamos de braços abertos!";
+
+            // Atualizar campo ociosidade para data atual
+            $cliente->update([
+                'ociosidade' => Carbon::now()
+            ]);
+
+            // Codificar mensagem para URL
+            $mensagemCodificada = urlencode($mensagem);
+
+            // Gerar URL do WhatsApp
+            $whatsappUrl = "https://wa.me/{$telefone}?text={$mensagemCodificada}";
+
+            // Log da ação
+            \Log::info("Mensagem de reativação enviada para cliente {$cliente->nome} (ID: {$id})");
+
+            return response()->json([
+                'success' => true,
+                'whatsapp_url' => $whatsappUrl,
+                'message' => 'Link do WhatsApp gerado com sucesso!'
+            ]);
+
+        } catch (Exception $e) {
+            \Log::error('Erro ao enviar mensagem para cliente ocioso: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao processar solicitação: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Extrai os primeiros nomes, verificando se o segundo é uma conjunção
+     */
+    private function extrairPrimeirosNomes($nomeCompleto)
+    {
+        $nomes = explode(' ', trim($nomeCompleto));
+        $conjuncoes = ['da', 'de', 'do', 'das', 'dos', 'e', 'del', 'della', 'di', 'du', 'van', 'von', 'la', 'le', 'el'];
+        
+        if (count($nomes) >= 2 && in_array(strtolower($nomes[1]), $conjuncoes)) {
+            // Se o segundo nome é uma conjunção, usar apenas o primeiro
+            return $nomes[0];
+        } else {
+            // Caso contrário, usar os dois primeiros nomes
+            return implode(' ', array_slice($nomes, 0, 2));
+        }
+    }
+
 }

@@ -85,6 +85,9 @@
                             <a href="{{ route('clientes.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
                                 <i class="fas fa-address-book mr-2"></i>Listar
                             </a>
+                            <a href="{{ route('clientes.ociosos') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
+                                <i class="fas fa-user-clock mr-2"></i>Clientes Ociosos
+                            </a>
                             @if(Auth::check() && (Auth::user()->nivel === 'admin' || Auth::user()->limite))
                             <a href="{{ route('verificacao-limite.index') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-yellow-100">
                                 <i class="fas fa-credit-card mr-2"></i>Verificar Limite

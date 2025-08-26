@@ -45,6 +45,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/funcionario/edit/{id}', [FuncionarioController::class, 'edit'])->name('funcionario.edit');
     Route::put('/funcionario/update/{id}', [FuncionarioController::class, 'update'])->name('funcionario.update');
 
+    // Rotas para clientes ociosos (devem vir ANTES da rota resource)
+    Route::get('/clientes/ociosos', [ClienteController::class, 'clientesOciosos'])->name('clientes.ociosos');
+    Route::post('/clientes/{id}/mensagem-ocioso', [ClienteController::class, 'enviarMensagemOcioso'])->name('clientes.mensagem.ocioso');
+
     // Rotas para clientes
     Route::resource('clientes', ClienteController::class);
     Route::put('/upload_documentos/{id}', [ClienteController::class, 'uploadDocumentos'])->name('upload_documentos');
@@ -62,6 +66,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/clientes/{clienteId}/pagamentos/{pagamentoId}/whatsapp', [ClienteController::class, 'enviarWhatsappPagamento'])->name('clientes.pagamentos.whatsapp');
     Route::get('/clientes/{clienteId}/pagamentos/{pagamentoId}/comprovante', [ClienteController::class, 'imprimirComprovantePagamento'])->name('clientes.pagamentos.comprovante');
     Route::delete('/clientes/{clienteId}/pagamentos/{pagamentoId}/cancelar', [ClienteController::class, 'cancelarPagamento'])->name('clientes.pagamentos.cancelar');
+
+
 
     // Rotas para autorizados
     Route::resource('autorizados', AutorizadoController::class);
