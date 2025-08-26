@@ -7,6 +7,8 @@
     <link rel="icon" href="{{ asset('storage/uploads/sistema/icon.png') }}">
     @vite('resources/css/app.css')
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    @vite('resources/js/sweetalert-config.js')
 </head>
 <body class="min-h-screen bg-gradient-to-br from-yellow-400 via-yellow-500 to-red-500 flex items-center justify-center p-4">
     <!-- Container Principal -->
@@ -163,42 +165,17 @@
             }, 100);
         });
 
-        // Alertas personalizados
+        // Alertas personalizados usando JJAlert
         @if(session('horario_error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Acesso Negado',
-                text: '{{ session('horario_error') }}',
-                confirmButtonColor: '#dc2626',
-                background: '#fef2f2',
-                color: '#dc2626',
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                },
-                hideClass: {
-                    popup: 'animate__animated animate__fadeOutUp'
-                }
-            });
+            JJAlert.error('Acesso Negado', '{{ session('horario_error') }}');
         @endif
 
         @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso!',
-                text: '{{ session('success') }}',
-                confirmButtonColor: '#059669',
-                timer: 3000,
-                timerProgressBar: true
-            });
+            JJAlert.success('Sucesso!', '{{ session('success') }}');
         @endif
 
         @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: '{{ session('error') }}',
-                confirmButtonColor: '#dc2626'
-            });
+            JJAlert.error('Erro!', '{{ session('error') }}');
         @endif
     </script>
 </body>

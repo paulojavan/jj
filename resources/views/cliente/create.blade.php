@@ -1,188 +1,293 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Cadastro de Clientes</h1>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Cadastro de Cliente" 
+        subtitle="Preencha os dados do novo cliente"
+        icon="fas fa-user-plus">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-arrow-left" href="{{ route('clientes.index') }}">
+                Voltar
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('clientes.store') }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        <h1 class="text-center">Dados pessoais</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="nome" >Nome completo:</label>
-        <input class="form-input" type="text" name="nome" id="nome" placeholder="Nome do cliente" value="{{ old('nome') }}" >
+    <x-form action="{{ route('clientes.store') }}" method="POST" enctype="multipart/form-data">
+        <!-- Seção: Dados Pessoais -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-user mr-2"></i>Dados Pessoais
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="Nome Completo" 
+                    name="nome" 
+                    placeholder="Nome do cliente" 
+                    :value="old('nome')" 
+                    icon="fas fa-user"
+                    required />
+                
+                <x-input 
+                    label="Apelido" 
+                    name="apelido" 
+                    placeholder="Apelido do cliente" 
+                    :value="old('apelido')" 
+                    icon="fas fa-smile" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="RG" 
+                    name="rg" 
+                    placeholder="RG do cliente" 
+                    :value="old('rg')" 
+                    icon="fas fa-id-card"
+                    required />
+                
+                <x-input 
+                    label="CPF" 
+                    name="cpf" 
+                    placeholder="000.000.000-00" 
+                    :value="old('cpf')" 
+                    icon="fas fa-id-card-alt"
+                    mask="cpf"
+                    required />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="Nome da Mãe" 
+                    name="mae" 
+                    placeholder="Nome da mãe" 
+                    :value="old('mae')" 
+                    icon="fas fa-female"
+                    required />
+                
+                <x-input 
+                    label="Nome do Pai" 
+                    name="pai" 
+                    placeholder="Nome do pai" 
+                    :value="old('pai')" 
+                    icon="fas fa-male" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="Telefone" 
+                    name="telefone" 
+                    placeholder="(XX) XXXXX-XXXX" 
+                    :value="old('telefone')" 
+                    icon="fas fa-phone"
+                    mask="telefone"
+                    required />
+                
+                <x-input 
+                    label="Data de Nascimento" 
+                    name="nascimento" 
+                    type="date"
+                    :value="old('nascimento')" 
+                    icon="fas fa-calendar"
+                    required />
+            </div>
+
+            <x-input 
+                label="Fonte de Renda" 
+                name="renda" 
+                placeholder="Fonte de renda do cliente" 
+                :value="old('renda')" 
+                icon="fas fa-briefcase"
+                required />
         </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="apelido" >Apelido:</label>
-        <input class="form-input" type="text" name="apelido" id="apelido" placeholder="Apelido do cliente" value="{{ old('apelido') }}">
+        <!-- Seção: Dados da Referência -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-users mr-2"></i>Dados da Referência
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="Nome da Referência" 
+                    name="nome_referencia" 
+                    placeholder="Nome da pessoa de referência" 
+                    :value="old('nome_referencia')" 
+                    icon="fas fa-user-friends"
+                    required />
+                
+                <x-input 
+                    label="Telefone da Referência" 
+                    name="telefone_referencia" 
+                    placeholder="(XX) XXXXX-XXXX" 
+                    :value="old('telefone_referencia')" 
+                    icon="fas fa-phone"
+                    mask="telefone"
+                    required />
+            </div>
+
+            <x-input 
+                label="Parentesco" 
+                name="parentesco" 
+                placeholder="Grau de parentesco com o cliente" 
+                :value="old('parentesco')" 
+                icon="fas fa-heart"
+                required />
         </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="rg" >Rg:</label>
-        <input class="form-input" type="text" name="rg" id="rg" placeholder="RG do cliente" value="{{ old('rg') }}" >
+        <!-- Seção: Referências Comerciais -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-store mr-2"></i>Referências Comerciais
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <!-- Referência Comercial 1 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 class="font-semibold text-gray-700 mb-3">Referência Comercial 1</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input 
+                        label="Nome da Empresa" 
+                        name="referencia_comercial1" 
+                        placeholder="Nome da empresa" 
+                        :value="old('referencia_comercial1')" 
+                        icon="fas fa-building" />
+                    
+                    <x-input 
+                        label="Telefone" 
+                        name="telefone_referencia_comercial1" 
+                        placeholder="(XX) XXXXX-XXXX" 
+                        :value="old('telefone_referencia_comercial1')" 
+                        icon="fas fa-phone"
+                        mask="telefone" />
+                </div>
+            </div>
+
+            <!-- Referência Comercial 2 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 class="font-semibold text-gray-700 mb-3">Referência Comercial 2</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input 
+                        label="Nome da Empresa" 
+                        name="referencia_comercial2" 
+                        placeholder="Nome da empresa" 
+                        :value="old('referencia_comercial2')" 
+                        icon="fas fa-building" />
+                    
+                    <x-input 
+                        label="Telefone" 
+                        name="telefone_referencia_comercial2" 
+                        placeholder="(XX) XXXXX-XXXX" 
+                        :value="old('telefone_referencia_comercial2')" 
+                        icon="fas fa-phone"
+                        mask="telefone" />
+                </div>
+            </div>
+
+            <!-- Referência Comercial 3 -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 class="font-semibold text-gray-700 mb-3">Referência Comercial 3</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input 
+                        label="Nome da Empresa" 
+                        name="referencia_comercial3" 
+                        placeholder="Nome da empresa" 
+                        :value="old('referencia_comercial3')" 
+                        icon="fas fa-building" />
+                    
+                    <x-input 
+                        label="Telefone" 
+                        name="telefone_referencia_comercial3" 
+                        placeholder="(XX) XXXXX-XXXX" 
+                        :value="old('telefone_referencia_comercial3')" 
+                        icon="fas fa-phone"
+                        mask="telefone" />
+                </div>
+            </div>
         </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="cpf" >CPF:</label>
-        <input class="form-input" type="text" name="cpf" id="cpf" placeholder="CPF do cliente" value="{{ old('cpf') }}" >
+        <!-- Seção: Foto -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-camera mr-2"></i>Foto do Cliente
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <x-input 
+                label="Foto do Cliente" 
+                name="foto" 
+                type="file"
+                accept="image/*"
+                icon="fas fa-image"
+                help="Selecione uma foto do cliente (formatos: JPG, PNG, GIF)" />
         </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="mae">Nome da mãe:</label>
-        <input class="form-input" type="text" name="mae" id="mae" placeholder="Nome da mãe" value="{{ old('mae') }}" >
+        <!-- Seção: Endereço -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-map-marker-alt mr-2"></i>Informações de Endereço
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <x-input 
+                        label="Rua" 
+                        name="rua" 
+                        placeholder="Nome da rua" 
+                        :value="old('rua')" 
+                        icon="fas fa-road"
+                        required />
+                </div>
+                
+                <x-input 
+                    label="Número" 
+                    name="numero" 
+                    type="number"
+                    placeholder="Número da casa" 
+                    :value="old('numero')" 
+                    icon="fas fa-hashtag"
+                    required />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="Bairro" 
+                    name="bairro" 
+                    placeholder="Bairro" 
+                    :value="old('bairro')" 
+                    icon="fas fa-map"
+                    required />
+                
+                <x-input 
+                    label="Cidade" 
+                    name="cidade" 
+                    placeholder="Cidade" 
+                    :value="old('cidade')" 
+                    icon="fas fa-city"
+                    required />
+            </div>
+
+            <x-input 
+                label="Ponto de Referência" 
+                name="referencia" 
+                placeholder="Ponto de referência da casa" 
+                :value="old('referencia')" 
+                icon="fas fa-map-pin" />
         </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="pai">Nome do pai:</label>
-        <input class="form-input" type="text" name="pai" id="pai" placeholder="Nome do pai" value="{{ old('pai') }}">
+        <!-- Botões de Ação -->
+        <div class="flex justify-center gap-4">
+            <x-button variant="secondary" icon="fas fa-times" href="{{ route('clientes.index') }}">
+                Cancelar
+            </x-button>
+            <x-button type="submit" variant="success" icon="fas fa-save">
+                Cadastrar Cliente
+            </x-button>
         </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="telefone">Telefone do cliente:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone" id="telefone" placeholder="(XX) XXXXX-XXXX" value="{{ old('telefone') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="nascimento">Data de nascimento:</label>
-        <input class="form-input" type="date" name="nascimento" id="nascimento" value="{{ old('nascimento') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="renda">Fonte de renda:</label>
-        <input class="form-input" type="text" name="renda" id="renda" placeholder="Fonte de renda do cliente" value="{{ old('renda') }}" >
-        </div>
-
-        <br><h1 class="text-center">Dados da referencia</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="nome_referencia" >Nome da referencia:</label>
-        <input class="form-input" type="text" name="nome_referencia" id="nome_referencia" placeholder="Nome da pessoa de referencia" value="{{ old('nome') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia">Telefone da referencia:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia" id="telefone_referencia" placeholder="(XX) XXXXX-XXXX" value="{{ old('telefone_referencia') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="parentesco">Parentesco:</label>
-        <input class="form-input" type="text" name="parentesco" id="parentesco" placeholder="Gráu de parentesco com o cliente" value="{{ old('parentesco') }}" >
-        </div>
-
-        <br><h1 class="text-center">Referencias comerciais:</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="referencia_comercial1">Referencia comercial 1:</label>
-        <input class="form-input" type="text" name="referencia_comercial1" id="referencia_comercial1" placeholder="Referencia comercial" value="{{ old('referencia_comercial1') }}">
-        </div>
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia_comercial1">Telefone da referencia comercial 1:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia_comercial1" id="telefone_referencia_comercial1" placeholder="(XX) XXXXX-XXXX" value="{{ old('telefone_referencia_comercial1') }}">
-        </div><br>
-
-        <div class="mb-4">
-        <label class="form-label" for="referencia_comercial2">Referencia comercial 2:</label>
-        <input class="form-input" type="text" name="referencia_comercial2" id="referencia_comercial2" placeholder="Referencia comercial" value="{{ old('referencia_comercial2') }}">
-        </div>
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia_comercial2">Telefone da referencia comercial 2:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia_comercial2" id="telefone_referencia_comercial2" placeholder="(XX) XXXXX-XXXX" value="{{ old('telefone_referencia_comercial2') }}">
-        </div><br>
-
-        <div class="mb-4">
-        <label class="form-label" for="referencia_comercial3">Referencia comercial 3:</label>
-        <input class="form-input" type="text" name="referencia_comercial3" id="referencia_comercial3" placeholder="Referencia comercial" value="{{ old('referencia_comercial3') }}">
-        </div>
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia_comercial3">Telefone da referencia comercial 3:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia_comercial3" id="telefone_referencia_comercial3" placeholder="(XX) XXXXX-XXXX" value="{{ old('telefone_referencia_comercial3') }}">
-        </div>
-
-        <br><h1 class="text-center">Foto:</h1><hr><br>
-        <div class="mb-4">
-            <label class="form-label" for="foto">Foto do cliente:</label>
-            <input class="form-file" id="foto" name="foto" type="file" multiple accept="image/*" >
-        </div>
-
-        <br><h1 class="text-center">Informaçoes de endereço:</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="rua">Rua:</label>
-        <input class="form-input" type="text" name="rua" id="rua" placeholder="Nome da rua" value="{{ old('rua') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="numero">Número:</label>
-        <input class="form-input" type="number" name="numero" id="numero" placeholder="Numero da casa" value="{{ old('numero') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="bairro">Bairro:</label>
-        <input class="form-input" type="text" name="bairro" id="bairro" placeholder="Bairro" value="{{ old('bairro') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="referencia">Ponto de referencia:</label>
-        <input class="form-input" type="text" name="referencia" id="referencia" placeholder="Ponro de referencia da casa" value="{{ old('referencia') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="cidade">Cidade:</label>
-        <input class="form-input" type="text" name="cidade" id="cidade" placeholder="Cidade" value="{{ old('cidade') }}" >
-        </div>
-
-        <div class="mb-4 text-center">
-        <input class="btn-green" type="submit" value="Cadastrar cliente">
-        </div>
-    </form>
-
-    </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Seleciona todos os campos com a classe telefone-mask
-        const telefoneInputs = document.querySelectorAll('.telefone-mask');
-
-        // Adiciona o evento de input para cada campo de telefone
-        telefoneInputs.forEach(function(input) {
-            input.addEventListener('input', function(e) {
-                let value = e.target.value;
-
-                // Remove todos os caracteres não numéricos
-                value = value.replace(/\D/g, '');
-
-                // Limita a 11 dígitos (telefone brasileiro com DDD)
-                if (value.length > 11) {
-                    value = value.slice(0, 11);
-                }
-
-                // Aplica a máscara de telefone (XX) XXXXX-XXXX
-                if (value.length > 0) {
-                    // Adiciona o parêntese no início
-                    value = '(' + value;
-
-                    // Fecha o parêntese após o DDD (2 dígitos)
-                    if (value.length > 3) {
-                        value = value.substring(0, 3) + ') ' + value.substring(3);
-                    }
-
-                    // Adiciona o hífen após o quinto dígito do número
-                    if (value.length > 10) {
-                        value = value.substring(0, 10) + '-' + value.substring(10);
-                    }
-                }
-
-                e.target.value = value;
-            });
-
-            // Formata o valor inicial se existir
-            if (input.value) {
-                const event = new Event('input');
-                input.dispatchEvent(event);
-            }
-        });
-    });
-</script>
+    </x-form>
 
 @endsection

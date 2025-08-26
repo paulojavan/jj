@@ -522,33 +522,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Contar itens no carrinho
             const cartItems = document.querySelectorAll('.table-row').length;
             
-            Swal.fire({
-                title: '<strong>Finalizar Compra</strong>',
-                html: `
-                    <div class="text-left">
-                        <div class="mb-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="font-semibold text-gray-700">Total de itens:</span>
-                                <span class="font-bold text-red-600">${cartItems}</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="font-semibold text-gray-700">Valor total:</span>
-                                <span class="font-bold text-green-600 text-lg">${totalValue}</span>
-                            </div>
-                        </div>
-                        <p class="text-gray-600 text-center">
-                            <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
-                            Esta ação não pode ser desfeita!
-                        </p>
-                    </div>
-                `,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#16a34a',
-                cancelButtonColor: '#dc2626',
-                confirmButtonText: '<i class="fas fa-check mr-2"></i>Sim, finalizar!',
-                cancelButtonText: '<i class="fas fa-times mr-2"></i>Cancelar',
-                reverseButtons: true,
+            JJAlert.finalizarCompra(cartItems, totalValue)tons: true,
                 focusCancel: true,
                 customClass: {
                     popup: 'swal2-popup-custom',

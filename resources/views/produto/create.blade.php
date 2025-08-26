@@ -1,111 +1,158 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Cadastro de Produtos</h1>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Cadastro de Produto" 
+        subtitle="Adicione um novo produto ao catálogo"
+        icon="fas fa-plus-circle">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-arrow-left" href="{{ route('produtos.index') }}">
+                Voltar
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('produtos.store') }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
+    <x-form action="{{ route('produtos.store') }}" method="POST" enctype="multipart/form-data">
 
-        <div class="mb-4">
-        <label class="form-label" for="produto" >Produto:</label>
-        <input class="form-input" type="text" name="produto" id="produto" placeholder="Produto" value="{{ old('produto') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="marca" >Marca:</label>
-        <select class="form-input" name="marca" id="marca">
-            @foreach ($marcas as $marca)
-                <option value="{{ $marca->marca }}">{{ $marca->marca }}</option>
-            @endforeach
-        </select>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="genero" >Genero:</label>
-            <select class="form-input" name="genero" id="genero">
-                <option value="masculino">Masculino</option>
-                <option value="feminino">Feminino</option>
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="grupo" >Grupo:</label>
-            <select class="form-input" name="grupo" id="grupo">
-                @foreach ($grupos as $grupo)
-                <option value="{{ $grupo->grupo }}">{{ $grupo->grupo }}</option>
-            @endforeach
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="subgrupo" >Sub-grupo:</label>
-            <select class="form-input" name="subgrupo" id="subgrupo">
-                @foreach ($subgrupos as $subgrupo)
-                    <option value="{{ $subgrupo->subgrupo }}">{{ $subgrupo->subgrupo }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="codigo" >Codigo:</label>
-            <input class="form-input" type="text" name="codigo" id="codigo" placeholder="Codigo" value="{{ old('codigo') }}" >
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="quantidade" >Quantidade:</label>
-            <input class="form-input" type="number" name="quantidade" id="quantidade" placeholder="Quantidade" value="{{ old('quantidade') }}" >
-        </div>
-
-        <div class="mb-4 flex flex-col md:flex-row">
-            <div class="flex-1">
-                <label class="form-label" for="num1" >Número Inicial:</label>
-                <select class="form-input" name="num1" id="num1">
-                    @for ($i = 14; $i <= 46; $i++)
-                        <option value="{{ $i }}">{{ $i }}</option>
-                    @endfor
-                </select>
-            </div>
-            <div class="flex-1">
-                <label class="form-label" for="num2" >Número Final:</label>
-                <select class="form-input" name="num2" id="num2">
-                    @for ($i = 14; $i <= 46; $i++)
-                        <option value="{{ $i }}">{{ $i }}</option>
-                    @endfor
-                </select>
-            </div>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="preco" >Preço:</label>
-            <input class="form-input" type="text" name="preco" id="preco" placeholder="Preço do produto" value="{{ old('preco') }}" oninput="formatCurrency(this)" >
+        <!-- Seção: Informações Básicas -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-info-circle mr-2"></i>Informações Básicas
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="Nome do Produto" 
+                    name="produto" 
+                    placeholder="Nome do produto" 
+                    :value="old('produto')" 
+                    icon="fas fa-shoe-prints"
+                    required />
+                
+                <x-input 
+                    label="Código" 
+                    name="codigo" 
+                    placeholder="Código do produto" 
+                    :value="old('codigo')" 
+                    icon="fas fa-barcode"
+                    required />
             </div>
 
-        <div class="mb-4">
-            <label class="form-label" for="foto">Foto do produto:</label>
-            <input class="form-file" id="foto" name="foto" type="file" multiple accept="image/*" >
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <x-input 
+                    type="select"
+                    label="Marca" 
+                    name="marca" 
+                    :options="collect($marcas)->pluck('marca', 'marca')->toArray()"
+                    icon="fas fa-tags"
+                    required />
+                
+                <x-input 
+                    type="select"
+                    label="Gênero" 
+                    name="genero" 
+                    :options="[
+                        'masculino' => 'Masculino',
+                        'feminino' => 'Feminino'
+                    ]"
+                    icon="fas fa-venus-mars"
+                    required />
+                
+                <x-input 
+                    label="Quantidade" 
+                    name="quantidade" 
+                    type="number"
+                    placeholder="Quantidade em estoque" 
+                    :value="old('quantidade')" 
+                    icon="fas fa-boxes"
+                    required />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    type="select"
+                    label="Grupo" 
+                    name="grupo" 
+                    :options="collect($grupos)->pluck('grupo', 'grupo')->toArray()"
+                    icon="fas fa-layer-group"
+                    required />
+                
+                <x-input 
+                    type="select"
+                    label="Sub-grupo" 
+                    name="subgrupo" 
+                    :options="collect($subgrupos)->pluck('subgrupo', 'subgrupo')->toArray()"
+                    icon="fas fa-sitemap"
+                    required />
+            </div>
         </div>
 
-
-
-        <div class="mb-4 text-center">
-        <input class="btn-green" type="submit" value="Cadastrar produto">
+        <!-- Seção: Numeração -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-ruler mr-2"></i>Numeração Disponível
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    type="select"
+                    label="Número Inicial" 
+                    name="num1" 
+                    :options="array_combine(range(14, 46), range(14, 46))"
+                    icon="fas fa-play"
+                    required />
+                
+                <x-input 
+                    type="select"
+                    label="Número Final" 
+                    name="num2" 
+                    :options="array_combine(range(14, 46), range(14, 46))"
+                    icon="fas fa-stop"
+                    required />
+            </div>
         </div>
-    </form>
 
-    </div>
+        <!-- Seção: Preço e Foto -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-dollar-sign mr-2"></i>Preço e Imagem
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <x-input 
+                    label="Preço" 
+                    name="preco" 
+                    placeholder="R$ 0,00" 
+                    :value="old('preco')" 
+                    icon="fas fa-money-bill-wave"
+                    mask="money"
+                    required />
+                
+                <x-input 
+                    label="Foto do Produto" 
+                    name="foto" 
+                    type="file"
+                    accept="image/*"
+                    icon="fas fa-camera"
+                    help="Selecione uma foto do produto (formatos: JPG, PNG, GIF)" />
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex justify-center gap-4">
+            <x-button variant="secondary" icon="fas fa-times" href="{{ route('produtos.index') }}">
+                Cancelar
+            </x-button>
+            <x-button type="submit" variant="success" icon="fas fa-save">
+                Cadastrar Produto
+            </x-button>
+        </div>
+    </x-form>
 
 @endsection
-<script>
-function formatCurrency(input) {
-    let value = input.value.replace(/\D/g, '');
-    value = (value / 100).toFixed(2) + '';
-    value = value.replace('.', ',');
-    value = value.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-    input.value = 'R$ ' + value;
-}
-</script>

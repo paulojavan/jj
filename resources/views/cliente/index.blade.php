@@ -1,127 +1,154 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content text-center">
-        <div class="mb-4">
-            <form action="{{ route('clientes.index') }}" method="get" class="form-container">
+<div class="content">
+    <x-page-header 
+        title="Clientes" 
+        subtitle="Gerencie os clientes da loja"
+        icon="fas fa-user-friends">
+        <x-slot name="actions">
+            <x-button variant="success" icon="fas fa-user-plus" href="{{ route('clientes.create') }}">
+                Cadastrar Cliente
+            </x-button>
+        </x-slot>
+    </x-page-header>
+
+    <x-card class="mb-6">
+        <form action="{{ route('clientes.index') }}" method="get">
             <div class="flex flex-col md:flex-row gap-4">
-                <input class="form-input flex-1" type="text" name="cliente" id="cliente" placeholder="Pesquisar Cliente" value="{{ request('cliente') }}">
-                <button type="submit" class="btn-green w-full md:w-auto">Procurar cliente</button>
+                <x-input 
+                    name="cliente" 
+                    placeholder="Pesquisar Cliente" 
+                    value="{{ request('cliente') }}"
+                    icon="fas fa-search"
+                    class="flex-1" />
+                <x-button type="submit" variant="success" icon="fas fa-search">
+                    Procurar Cliente
+                </x-button>
             </div>
-            </form>
-        </div>
+        </form>
+    </x-card>
 
     <x-alert />
 
     {{-- Container para a visualização em tabela (telas médias e maiores) --}}
-    <div class="hidden md:block table-container">
-        <table class="table w-full">
-            <thead class="table-header-group">
-                <tr class="table-header">
-                    <th class="table-header w-24 text-center">Foto</th>
-                    <th class="table-header flex-1 text-center">Nome</th>
-                    <th class="table-header w-24 text-center">Ações</th>
+    <div class="hidden md:block">
+        <x-table :headers="[
+            ['label' => 'Foto', 'class' => 'w-24 text-center'],
+            ['label' => 'Nome', 'class' => 'flex-1 text-center'],
+            ['label' => 'Ações', 'class' => 'w-48 text-center']
+        ]">
+            @forelse ($clientes as $cliente)
+                @php
+                    $pasta = $cliente->pasta ?? $cliente->cpf;
+                @endphp
+
+                <tr class="table-row">
+                    <td class="table-cell align-middle text-center">
+                        <img class="h-20 w-20 object-cover rounded-lg shadow-sm border border-yellow-200 mx-auto" 
+                             src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $cliente->foto) }}" 
+                             alt="{{ $cliente->nome }}">
+                    </td>
+                    <td class="table-cell align-middle text-center">
+                        <div class="font-semibold text-red-600">{{ $cliente->nome }}</div>
+                        <div class="text-sm text-gray-500">{{ $cliente->cpf }}</div>
+                    </td>
+                    <td class="table-actions align-middle">
+                        <div class="flex flex-col gap-2">
+                            <x-button variant="info" size="sm" icon="fas fa-edit" href="{{ route('clientes.edit', $cliente->id) }}">
+                                Editar
+                            </x-button>
+                            <x-button variant="secondary" size="sm" icon="fas fa-history" href="{{ route('clientes.historico.compras', $cliente->id) }}">
+                                Histórico
+                            </x-button>
+                            <x-button variant="success" size="sm" icon="fas fa-receipt" href="{{ route('clientes.historico.pagamentos', $cliente->id) }}">
+                                Pagamentos
+                            </x-button>
+                            @if($cliente->tem_tickets_negativados ?? false)
+                                <x-button variant="danger" size="sm" icon="fas fa-exclamation-triangle" href="{{ route('pagamentos.show', $cliente->id) }}">
+                                    Negativado
+                                </x-button>
+                            @else
+                                <x-button variant="primary" size="sm" icon="fas fa-dollar-sign" href="{{ route('pagamentos.show', $cliente->id) }}">
+                                    Pagar
+                                </x-button>
+                            @endif
+                        </div>
+                    </td>
                 </tr>
-            </thead>
-            <tbody class="table-body">
-                @forelse ($clientes as $cliente)
-
-                    @if ($cliente->pasta == null)
-                        @php
-                            $pasta = $cliente->cpf;
-                        @endphp
-                    @else
-                        @php
-                            $pasta = $cliente->pasta;
-                        @endphp
-                    @endif
-
-                    <tr class="table-row">
-                        <td class="table-cell align-middle text-center">
-                            <img class="h-60 max-w-xs img-preview" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $cliente->foto) }}" alt="{{ $cliente->name }}">
-                        </td>
-                        <td class="table-cell align-middle text-center">{{ $cliente->nome }}<br>{{ $cliente->cpf }}</td>
-                        <td class="table-actions align-middle text-center">
-                            <div class="space-y-2">
-                                <a href="{{ route('clientes.edit', $cliente->id) }}" class="btn-green block">Editar</a>
-                                <a href="{{ route('clientes.historico.compras', $cliente->id) }}" class="btn-blue block">
-                                    <i class="fas fa-history mr-1"></i>Histórico compras
-                                </a>
-                                <a href="{{ route('clientes.historico.pagamentos', $cliente->id) }}" class="btn-green block mt-2">
-                                    <i class="fas fa-receipt mr-1"></i>Histórico pagamentos
-                                </a>
-                                @if($cliente->tem_tickets_negativados ?? false)
-                                    <a href="{{ route('pagamentos.show', $cliente->id) }}" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition duration-200 block mt-2 text-center">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>Negativado
-                                    </a>
-                                @else
-                                    <a href="{{ route('pagamentos.show', $cliente->id) }}" class="btn-yellow block mt-2">Pagar</a>
-                                @endif
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr class="table-row">
-                        <td colspan="3" class="table-cell text-center">Nenhum cliente encontrado</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+            @empty
+                <tr class="table-row">
+                    <td colspan="3" class="table-cell text-center py-8">
+                        <div class="text-gray-500">
+                            <i class="fas fa-users text-4xl mb-2"></i>
+                            <p>Nenhum cliente encontrado</p>
+                        </div>
+                    </td>
+                </tr>
+            @endforelse
+        </x-table>
     </div>
 
     {{-- Container para a visualização em cards (telas pequenas) --}}
     <div class="md:hidden space-y-4">
         @forelse ($clientes as $cliente)
+            @php
+                $pasta = $cliente->pasta ?? $cliente->cpf;
+            @endphp
 
-        @if ($cliente->pasta == null)
-                        @php
-                            $pasta = $cliente->cpf;
-                        @endphp
-                    @else
-                        @php
-                            $pasta = $cliente->pasta;
-                        @endphp
-                    @endif
-
-
-            <div class="border rounded-lg p-4 flex flex-col items-center shadow">
+            <x-card class="text-center">
                 {{-- Foto --}}
-                <div class="mb-2 flex justify-center">
-                    <img class="h-24 w-24 object-cover mx-auto" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $cliente->foto) }}" alt="{{ $cliente->name }}" style="width: 50%; height: auto;">
+                <div class="mb-4 flex justify-center">
+                    <img class="h-24 w-24 object-cover rounded-full shadow-md border-4 border-yellow-200" 
+                         src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $cliente->foto) }}" 
+                         alt="{{ $cliente->nome }}">
                 </div>
+                
                 {{-- Nome --}}
-                <div class="mb-2 text-center font-semibold">
-                    {{ $cliente->nome }}
+                <div class="mb-4">
+                    <h3 class="font-bold text-red-600 text-lg">{{ $cliente->nome }}</h3>
+                    <p class="text-gray-500 text-sm">{{ $cliente->cpf }}</p>
                 </div>
+                
                 {{-- Ações --}}
-                <div class="mt-auto space-y-2">
-                    <a href="{{ route('clientes.edit', $cliente->id) }}" class="btn-green block w-full text-center">Editar</a>
-                    <a href="{{ route('clientes.historico.compras', $cliente->id) }}" class="btn-blue block w-full text-center">
-                        <i class="fas fa-history mr-1"></i>Histórico
-                    </a>
-                    <a href="{{ route('clientes.historico.pagamentos', $cliente->id) }}" class="btn-green block w-full text-center mt-2">
-                        <i class="fas fa-receipt mr-1"></i>Pagamentos
-                    </a>
+                <div class="space-y-2">
+                    <x-button variant="info" size="sm" icon="fas fa-edit" href="{{ route('clientes.edit', $cliente->id) }}" class="w-full">
+                        Editar
+                    </x-button>
+                    <x-button variant="secondary" size="sm" icon="fas fa-history" href="{{ route('clientes.historico.compras', $cliente->id) }}" class="w-full">
+                        Histórico
+                    </x-button>
+                    <x-button variant="success" size="sm" icon="fas fa-receipt" href="{{ route('clientes.historico.pagamentos', $cliente->id) }}" class="w-full">
+                        Pagamentos
+                    </x-button>
                     @if($cliente->tem_tickets_negativados ?? false)
-                        <a href="{{ route('pagamentos.show', $cliente->id) }}" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition duration-200 block mt-2 text-center">
-                            <i class="fas fa-exclamation-triangle mr-1"></i>Negativado
-                        </a>
+                        <x-button variant="danger" size="sm" icon="fas fa-exclamation-triangle" href="{{ route('pagamentos.show', $cliente->id) }}" class="w-full">
+                            Negativado
+                        </x-button>
                     @else
-                        <a href="{{ route('pagamentos.show', $cliente->id) }}" class="btn-yellow block mt-2">Pagar</a>
+                        <x-button variant="primary" size="sm" icon="fas fa-dollar-sign" href="{{ route('pagamentos.show', $cliente->id) }}" class="w-full">
+                            Pagar
+                        </x-button>
                     @endif
                 </div>
-            </div>
+            </x-card>
         @empty
-            <div class="text-center text-gray-500 py-4">
-                Nenhum cliente encontrado
-            </div>
+            <x-card class="text-center py-8">
+                <div class="text-gray-500">
+                    <i class="fas fa-users text-6xl mb-4 text-gray-300"></i>
+                    <h3 class="text-xl font-semibold mb-2">Nenhum cliente encontrado</h3>
+                    <p>Tente ajustar os filtros de busca</p>
+                </div>
+            </x-card>
         @endforelse
     </div>
-    <div class="pagination">
-        @if ($clientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
-        {{ $clientes->appends(request()->except('page'))->links() }}
-        @endif
-    </div>
-    </div>
+    @if ($clientes instanceof \Illuminate\Pagination\LengthAwarePaginator)
+        <div class="mt-6 flex justify-center">
+            <div class="bg-white rounded-lg shadow-md border border-yellow-200 p-4">
+                {{ $clientes->appends(request()->except('page'))->links() }}
+            </div>
+        </div>
+    @endif
+</div>
 
 @endsection

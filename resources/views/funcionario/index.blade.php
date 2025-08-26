@@ -1,58 +1,76 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="content-title">
+<div class="content">
+    <x-page-header 
+        title="{{ request()->route('status') == 'inativo' ? 'Todos os Funcionários' : 'Funcionários Ativos' }}" 
+        subtitle="Gerencie os funcionários da empresa"
+        icon="fas fa-users">
+        <x-slot name="actions">
             @if(request()->route('status') == 'inativo')
-            <h1 class="page-title">Listando todos os funcionários</h1>
+                <x-button variant="primary" icon="fas fa-eye" href="{{ route('funcionario.index', 'ativo') }}">
+                    Mostrar Ativos
+                </x-button>
             @else
-            <h1 class="page-title">Listando funcionários ativos</h1>
+                <x-button variant="secondary" icon="fas fa-list" href="{{ route('funcionario.index', 'inativo') }}">
+                    Mostrar Todos
+                </x-button>
             @endif
-
-
-            @if(request()->route('status') == 'inativo')
-            <a href=" {{ route('funcionario.index', 'ativo') }} " class="btn-yellow">Mostrar Ativos</a>
-            @else
-            <a href=" {{ route('funcionario.index', 'inativo') }} " class="btn-yellow">Mostrar todos</a>
-            @endif
-
-
-            <a href=" {{ route('funcionario.cadastro') }} " class="btn-green">Cadastrar</a>
-        </div>
+            <x-button variant="success" icon="fas fa-user-plus" href="{{ route('funcionario.cadastro') }}">
+                Cadastrar
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <div class="table-container">
-        <table class="table">
-            <thead>
-                <tr class="table-header">
-                    <th class="table-header">Nome</th>
-                    <th class="table-header center">Ações</th>
-                </tr>
-            </thead>
-
-            <tbody class="table-body">
-                @forelse ($funcionarios as $funcionario)
-                    <tr class="table-row">
-                        <td class="table-cell">{{ $funcionario->name }}</td>
-                        <td class="table-actions">
-                            <a href="#" class="btn-green">Detalhes</a>
-                            <a href="{{ route('funcionario.edit', ['id' => $funcionario->id]) }}" class="btn-blue">Editar</a>
-                        </td>
-                    </tr>
-                @empty
-                    <div class="alert-error">
-                        Não há vendedores Encontrados
+    <x-table :headers="[
+        ['label' => 'Nome', 'class' => 'flex-1'],
+        ['label' => 'Ações', 'class' => 'w-48 text-center']
+    ]">
+        @forelse ($funcionarios as $funcionario)
+            <tr class="table-row">
+                <td class="table-cell">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center mr-3">
+                            <i class="fas fa-user text-red-600"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-red-600">{{ $funcionario->name }}</div>
+                            <div class="text-sm text-gray-500">Funcionário</div>
+                        </div>
                     </div>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+                </td>
+                <td class="table-actions">
+                    <div class="flex gap-2 justify-center">
+                        <x-button variant="success" size="sm" icon="fas fa-eye" href="#">
+                            Detalhes
+                        </x-button>
+                        <x-button variant="info" size="sm" icon="fas fa-edit" href="{{ route('funcionario.edit', ['id' => $funcionario->id]) }}">
+                            Editar
+                        </x-button>
+                    </div>
+                </td>
+            </tr>
+        @empty
+            <tr class="table-row">
+                <td colspan="2" class="table-cell text-center py-8">
+                    <div class="text-gray-500">
+                        <i class="fas fa-users text-4xl mb-2"></i>
+                        <p>Nenhum funcionário encontrado</p>
+                    </div>
+                </td>
+            </tr>
+        @endforelse
+    </x-table>
 
-    <div class="pagination">
-        {{ $funcionarios->links() }}
-    </div>
-
-    </div>
+    @if($funcionarios->hasPages())
+        <div class="mt-6 flex justify-center">
+            <div class="bg-white rounded-lg shadow-md border border-yellow-200 p-4">
+                {{ $funcionarios->links() }}
+            </div>
+        </div>
+    @endif
+</div>
 
 @endsection

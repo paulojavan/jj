@@ -287,4 +287,213 @@
     @apply p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 border border-red-300 shadow-sm;
 }
 /****** Fim Melhorias Gerais ******/
+
+/****** Início SweetAlert2 Customizado ******/
+/* Estilos personalizados para SweetAlert2 - JJ Calçados */
+.swal2-popup-jj {
+    border-radius: 15px !important;
+    padding: 2rem !important;
+    border: 3px solid #fbbf24 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.swal2-title-jj {
+    color: #dc2626 !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 1rem !important;
+}
+
+.swal2-content-jj {
+    color: #374151 !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+}
+
+/* Botões de confirmação */
+.swal2-confirm-success {
+    background: linear-gradient(135deg, #16a34a, #15803d) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-confirm-success:hover {
+    background: linear-gradient(135deg, #15803d, #166534) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 15px -3px rgba(22, 163, 74, 0.4) !important;
+}
+
+.swal2-confirm-error {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-confirm-error:hover {
+    background: linear-gradient(135deg, #b91c1c, #991b1b) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 15px -3px rgba(220, 38, 38, 0.4) !important;
+}
+
+.swal2-confirm-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-confirm-warning:hover {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 15px -3px rgba(245, 158, 11, 0.4) !important;
+}
+
+.swal2-confirm-info {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-confirm-info:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 15px -3px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Botões de cancelamento */
+.swal2-cancel-error {
+    background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 12px 24px !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+
+.swal2-cancel-error:hover {
+    background: linear-gradient(135deg, #4b5563, #374151) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 8px 15px -3px rgba(107, 114, 128, 0.4) !important;
+}
+
+/* Ícones personalizados */
+.swal2-icon.swal2-success {
+    border-color: #16a34a !important;
+    color: #16a34a !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+}
+
+.swal2-icon.swal2-info {
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+}
+
+.swal2-icon.swal2-question {
+    border-color: #8b5cf6 !important;
+    color: #8b5cf6 !important;
+}
+
+/* Barra de progresso do timer */
+.swal2-timer-progress-bar {
+    background: #16a34a !important;
+}
+
+/* Animações personalizadas */
+@keyframes swal2-show-jj {
+    0% {
+        transform: scale(0.7) translateY(-20px);
+        opacity: 0;
+    }
+    45% {
+        transform: scale(1.05) translateY(0);
+        opacity: 1;
+    }
+    80% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes swal2-hide-jj {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0.5) translateY(-20px);
+        opacity: 0;
+    }
+}
+
+.swal2-show {
+    animation: swal2-show-jj 0.3s ease-out !important;
+}
+
+.swal2-hide {
+    animation: swal2-hide-jj 0.15s ease-in !important;
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    .swal2-popup-jj {
+        padding: 1.5rem !important;
+        margin: 1rem !important;
+        max-width: calc(100vw - 2rem) !important;
+    }
+    
+    .swal2-title-jj {
+        font-size: 1.25rem !important;
+    }
+    
+    .swal2-content-jj {
+        font-size: 0.9rem !important;
+    }
+    
+    .swal2-confirm-success,
+    .swal2-confirm-error,
+    .swal2-confirm-warning,
+    .swal2-confirm-info,
+    .swal2-cancel-error {
+        padding: 10px 20px !important;
+        font-size: 0.9rem !important;
+    }
+}
+/****** Fim SweetAlert2 Customizado ******/
 }
