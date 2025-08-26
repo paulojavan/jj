@@ -9,8 +9,13 @@ class Marca extends Model
 {
     /** @use HasFactory<\Database\Factories\MarcaFactory> */
     use HasFactory;
+    
+    protected $primaryKey = 'id_marca';
+    
     protected $fillable = [
         'marca',
         'desconto',
     ];
+
+
 }

@@ -8,7 +8,7 @@
 
     <x-alert />
 
-    <form action="{{ route('marcas.update', $marca->id) }}" method="post" enctype="multipart/form-data" class="form-container">
+    <form action="{{ route('marcas.update', $marca) }}" method="post" enctype="multipart/form-data" class="form-container">
         @csrf
         @method('PUT')
         <div class="mb-4">

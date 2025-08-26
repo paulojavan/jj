@@ -146,3 +146,8 @@ Laravel provides several ways to run the application locally.
 - **Database:** Uses Eloquent ORM for database interactions. Migrations are used for schema management.
 - **Authentication:** Uses Laravel's built-in authentication scaffolding, protected by `auth` middleware.
 - **Authorization:** Custom middleware like `check.product.access` is used for specific feature access control.
+
+## Safety Rules for Qwen Code
+
+- **Never run migrations:** Do not execute `php artisan migrate` or any other command that modifies the database schema.
+- **Never start the development server:** Do not execute `php artisan serve`, `composer run dev`, or any other command that starts the application server.

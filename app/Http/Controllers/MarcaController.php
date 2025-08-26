@@ -52,9 +52,8 @@ class MarcaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Marca $marca)
     {
-        $marca = Marca::findOrFail($id);
         return view('marca.edit', compact('marca'));
     }
 

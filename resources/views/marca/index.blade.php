@@ -24,13 +24,12 @@
                         <td class="table-cell">{{ $marca->marca }}</td>
                         <td class="table-actions">
                         <div class="flex flex-col md:flex-row">
+                            <a href="{{ route('marcas.edit', $marca) }}" class="btn-blue">Editar</a>
 
-                            <a href="{{ route('marcas.edit', ['marca' => $marca->id]) }}" class="btn-blue">Editar</a>
-
-                            <form id="delete-form-{{ $marca->id }}" action="{{ route('marcas.destroy', ['marca' => $marca->id]) }}" method="POST">
+                            <form id="delete-form-{{ $marca->id_marca }}" action="{{ route('marcas.destroy', $marca) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="button" name="excluir" id="excluir" class="btn-red" onclick="cofirmDelete({{ $marca->id }})">Excluir</button>
+                                <button type="button" name="excluir" id="excluir" class="btn-red" onclick="cofirmDelete({{ $marca->id_marca }})">Excluir</button>
                             </form>
                         </div>
                         </td>

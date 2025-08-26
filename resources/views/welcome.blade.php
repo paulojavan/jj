@@ -110,34 +110,7 @@
                 </a>
             </div>
 
-            <div class="dashboard-card">
-                <a href="{{ route('verificacao-limite.index') }}" class="dashboard-link">
-                    <div class="dashboard-icon">
-                        <i class="fas fa-credit-card mr-1"></i>
-                    </div>
-                    <h3 class="dashboard-title">Verificar<br>Limite</h3>
-                </a>
-            </div>
-
-            @if(Auth::check() && Auth::user()->nivel === 'administrador')
-            <div class="dashboard-card">
-                <a href="{{ route('negativacao.index') }}" class="dashboard-link">
-                    <div class="dashboard-icon">
-                        <i class="fas fa-exclamation-triangle text-3xl"></i>
-                    </div>
-                    <h3 class="dashboard-title">Negativação<br>SPC</h3>
-                </a>
-            </div>
-
-            <div class="dashboard-card">
-                <a href="{{ route('negativacao.negativados') }}" class="dashboard-link">
-                    <div class="dashboard-icon">
-                        <i class="fas fa-ban text-3xl"></i>
-                    </div>
-                    <h3 class="dashboard-title">Clientes<br>Negativados</h3>
-                </a>
-            </div>
-            @endif
+            
 
         </div>
     </div>
