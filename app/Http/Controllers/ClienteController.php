@@ -536,7 +536,7 @@ class ClienteController extends Controller
 
                 // Criar mensagem padrão se não foi fornecida uma personalizada
                 if (empty($mensagem) || $mensagem === 'Mensagem padrão') {
-                    $linkHistorico = url("/clientes/{$id}/historico-compras");
+                    $linkHistorico = url("/parcelas/");
                     $mensagemPadrao = "Joécio calçados informa: Olá {$cliente->nome}, compra realizada no valor de {$ticketData->valor_formatado}. Acompanhe suas parcelas através do link: {$linkHistorico}";
                     $mensagem = $mensagemPadrao;
                 }
@@ -698,7 +698,7 @@ class ClienteController extends Controller
 
             // Criar mensagem
             $dataFormatada = $pagamento->data->format('d/m/Y');
-            $mensagem = "Joécio calçados informa: Pagamento de parcela efetuado dia {$dataFormatada}, acesse o comprovante através do link: https://joeciocalçados.com.br/";
+            $mensagem = "Joécio calçados informa: Pagamento de parcela efetuado dia {$dataFormatada}, acesse o comprovante através do link: " . url('/parcelas/');
             
             // Codificar mensagem para URL
             $mensagemCodificada = urlencode($mensagem);

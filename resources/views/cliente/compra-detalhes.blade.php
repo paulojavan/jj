@@ -252,7 +252,7 @@
                     <textarea name="mensagem" id="mensagem" rows="4" 
                               class="form-textarea w-full" 
                               placeholder="Digite sua mensagem aqui ou deixe em branco para usar a mensagem padrão..." 
-                              maxlength="500">Joécio calçados informa: Olá {{ $cliente->nome }}, compra realizada no valor de {{ $ticketData->valor_formatado }}. Acompanhe suas parcelas através do link: {{ url("/clientes/{$cliente->id}/historico") }}</textarea>
+                              maxlength="500">Joécio calçados informa: Olá {{ $cliente->nome }}, compra realizada no valor de {{ $ticketData->valor_formatado }}. Acompanhe suas parcelas através do link: {{ url('/parcelas/') }}</textarea>
                     <p class="text-xs text-gray-500 mt-1">Máximo 500 caracteres. Para WhatsApp, uma mensagem padrão será usada se este campo estiver vazio.</p>
                 </div>
                 

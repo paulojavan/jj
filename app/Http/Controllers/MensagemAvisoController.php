@@ -61,7 +61,7 @@ class MensagemAvisoController extends Controller
         $mensagem .= "Olá *{$primeirosNomes}*, estamos passando apenas para lembrar que suas parcelas venceram recentemente.\n";
         $mensagem .= "Fique atento as datas de vencimento e evite juros em suas parcelas.\n";
         $mensagem .= "Voce pode acompanhar suas parcelas através do link:\n";
-        $mensagem .= "https://joeciocalçados.com.br/acompanharParcelas.php";
+        $mensagem .= url('/parcelas/');
         
         // Codificar a mensagem para URL
         $mensagemCodificada = urlencode($mensagem);

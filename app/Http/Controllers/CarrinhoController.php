@@ -1722,6 +1722,13 @@ class CarrinhoController extends Controller
             $clienteCrediario = Session::get('cliente_crediario');
             $clienteId = $clienteCrediario['id'] ?? null;
             
+            // Atualizar campo ociosidade do cliente com a data atual
+            if ($clienteId) {
+                \App\Models\Cliente::where('id', $clienteId)->update([
+                    'ociosidade' => now()->toDateString()
+                ]);
+            }
+            
             // Limpa as sessões
             $this->clearCreditSaleSessions();
 

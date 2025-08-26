@@ -209,6 +209,11 @@ class PagamentoController extends Controller
             ]);
         }
 
+        // Atualizar campo ociosidade do cliente com a data atual
+        $cliente->update([
+            'ociosidade' => $dataHora->toDateString()
+        ]);
+
         return redirect()->back()->with('success', 'Pagamento realizado com sucesso! ' . count($parcelas) . ' parcela(s) foram pagas.');
     }
 
