@@ -61,6 +61,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/clientes/{id}/duplicata/{ticket}', [ClienteController::class, 'gerarDuplicata'])->name('clientes.duplicata');
     Route::get('/clientes/{id}/carne/{ticket}', [ClienteController::class, 'gerarCarne'])->name('clientes.carne');
     Route::post('/clientes/{id}/mensagem/{ticket}', [ClienteController::class, 'enviarMensagem'])->name('clientes.mensagem');
+    
+    // Rota para devolução de compras
+    Route::post('/clientes/{id}/devolucao/{ticket}', [ClienteController::class, 'processarDevolucao'])->name('clientes.devolucao');
+    Route::get('/clientes/{id}/venda-info/{ticket}', [ClienteController::class, 'buscarInformacoesVenda'])->name('clientes.venda.info');
 
     // Rotas para funcionalidades dos botões do histórico de pagamentos
     Route::post('/clientes/{clienteId}/pagamentos/{pagamentoId}/whatsapp', [ClienteController::class, 'enviarWhatsappPagamento'])->name('clientes.pagamentos.whatsapp');
@@ -82,6 +86,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/produtos/process-return', [ProdutoController::class, 'processReturn'])->name('produtos.processReturn');
     Route::post('/produtos/process-exchange', [ProdutoController::class, 'processExchange'])->name('produtos.processExchange');
     Route::get('/produtos/{produto}/available-sizes', [ProdutoController::class, 'getAvailableSizesAjax'])->name('produtos.availableSizes');
+    Route::get('/produtos/venda-info/{saleId}', [ProdutoController::class, 'buscarInformacoesVendaProduto'])->name('produtos.venda.info');
 
      // Rotas do Carrinho
      Route::post('/carrinho/adicionar/{id}', [CarrinhoController::class, 'adicionar'])->name('carrinho.adicionar');

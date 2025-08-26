@@ -59,6 +59,15 @@
     background-color: #4B5563;
 }
 
+.btn-gray {
+    background-color: #9CA3AF;
+    color: white;
+}
+
+.btn-gray:hover {
+    background-color: #6B7280;
+}
+
 /* Cards de pagamento */
 .payment-card {
     transition: all 0.3s ease;

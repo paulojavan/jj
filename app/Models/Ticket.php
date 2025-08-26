@@ -62,7 +62,26 @@ class Ticket extends Model
      */
     public function isDevolvida(): bool
     {
-        return $this->parcelas()->where('status', 'devolucao')->exists();
+        return $this->parcelasRelacao()->where('status', 'devolucao')->exists();
+    }
+
+    /**
+     * Verifica se a compra pode ser devolvida
+     */
+    public function canBeReturned(): bool
+    {
+        // Não pode devolver se já foi devolvida
+        if ($this->isDevolvida()) {
+            return false;
+        }
+
+        // Não pode devolver se alguma parcela foi paga (status diferente de 'aguardando pagamento')
+        $parcelasPagas = $this->parcelasRelacao()
+            ->where('status', '!=', 'aguardando pagamento')
+            ->where('status', '!=', 'devolucao') // Excluir parcelas já devolvidas
+            ->count();
+
+        return $parcelasPagas === 0;
     }
 
     /**

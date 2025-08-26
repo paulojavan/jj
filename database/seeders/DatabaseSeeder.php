@@ -16,8 +16,18 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Admin User',
+            'login' => 'admin',
+            'password' => bcrypt('password'),
+            'cidade' => 'tabira',
+            'nivel' => 'administrador',
+            'status' => 'ativo',
+            'image' => 'default.jpg',
+            'cadastro_produtos' => true,
+            'ajuste_estoque' => true,
+            'vendas_crediario' => true,
+            'limite' => true,
+            'recebimentos' => true,
         ]);
 
         // Seed default penalty configuration

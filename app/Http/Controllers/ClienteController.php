@@ -7,6 +7,7 @@ use App\Models\Ticket;
 use App\Models\Parcela;
 use App\Models\Pagamento;
 use App\Services\PaymentProfileService;
+use App\Services\CreditReturnService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -664,6 +665,75 @@ class ClienteController extends Controller
     }
 
     /**
+     * Busca informações do operador de caixa e vendedor atendente
+     */
+    public function buscarInformacoesVenda(Request $request, $clienteId, $ticketNumber)
+    {
+        try {
+            // Buscar a primeira parcela para determinar a cidade/bd
+            $parcela = Parcela::where('ticket', $ticketNumber)->first();
+            
+            if (!$parcela || !$parcela->bd) {
+                return [
+                    'operador_caixa' => 'Não identificado',
+                    'vendedor_atendente' => 'Não identificado'
+                ];
+            }
+
+            // Determinar a tabela de vendas
+            $tabelaVendas = $this->determinarTabelaVendas($parcela->bd);
+            
+            if (!$tabelaVendas) {
+                return [
+                    'operador_caixa' => 'Não identificado',
+                    'vendedor_atendente' => 'Não identificado'
+                ];
+            }
+
+            // Buscar informações da venda
+            $venda = DB::table($tabelaVendas)
+                ->where('ticket', $ticketNumber)
+                ->select('id_vendedor', 'id_vendedor_atendente')
+                ->first();
+
+            if (!$venda) {
+                return [
+                    'operador_caixa' => 'Não identificado',
+                    'vendedor_atendente' => 'Não identificado'
+                ];
+            }
+
+            // Buscar nomes dos usuários
+            $operadorCaixa = 'Não identificado';
+            $vendedorAtendente = 'Não identificado';
+
+            if ($venda->id_vendedor) {
+                $operador = DB::table('users')->where('id', $venda->id_vendedor)->first();
+                $operadorCaixa = $operador ? $operador->name : 'ID: ' . $venda->id_vendedor;
+            }
+
+            if ($venda->id_vendedor_atendente) {
+                $vendedor = DB::table('users')->where('id', $venda->id_vendedor_atendente)->first();
+                $vendedorAtendente = $vendedor ? $vendedor->name : 'ID: ' . $venda->id_vendedor_atendente;
+            }
+
+            return response()->json([
+                'success' => true,
+                'operador_caixa' => $operadorCaixa,
+                'vendedor_atendente' => $vendedorAtendente
+            ]);
+
+        } catch (Exception $e) {
+            \Log::error('Erro ao buscar informações da venda: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'operador_caixa' => 'Erro ao buscar',
+                'vendedor_atendente' => 'Erro ao buscar'
+            ]);
+        }
+    }
+
+    /**
      * Envia mensagem WhatsApp sobre pagamento
      */
     public function enviarWhatsappPagamento(Request $request, $clienteId, $pagamentoId)
@@ -921,6 +991,89 @@ class ClienteController extends Controller
         } else {
             // Caso contrário, usar os dois primeiros nomes
             return implode(' ', array_slice($nomes, 0, 2));
+        }
+    }
+
+    /**
+     * Processa a devolução de uma compra no crediário
+     */
+    public function processarDevolucao(Request $request, $clienteId, $ticketNumber)
+    {
+        try {
+            // Log para debug
+            \Log::info('Iniciando processamento de devolução', [
+                'cliente_id' => $clienteId,
+                'ticket' => $ticketNumber,
+                'user_id' => auth()->id() ?? 'system'
+            ]);
+
+            // Validar se o cliente existe
+            $cliente = Cliente::findOrFail($clienteId);
+            \Log::info('Cliente encontrado: ' . $cliente->nome);
+
+            // Validar se o ticket pertence ao cliente
+            $ticket = Ticket::where('ticket', $ticketNumber)
+                ->where('id_cliente', $clienteId)
+                ->first();
+
+            if (!$ticket) {
+                \Log::warning('Ticket não encontrado', [
+                    'cliente_id' => $clienteId,
+                    'ticket' => $ticketNumber
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ticket não encontrado para este cliente.'
+                ], 404);
+            }
+
+            \Log::info('Ticket encontrado, verificando se pode ser devolvido');
+
+            // Verificar se a devolução é possível
+            if (!$ticket->canBeReturned()) {
+                \Log::warning('Ticket não pode ser devolvido', [
+                    'ticket' => $ticketNumber,
+                    'motivo' => 'Parcelas pagas ou já devolvido'
+                ]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Esta compra não pode ser devolvida. Verifique se não há parcelas pagas.'
+                ], 400);
+            }
+
+            \Log::info('Ticket pode ser devolvido, iniciando processamento');
+
+            // Processar devolução usando o service
+            $creditReturnService = new CreditReturnService();
+            $result = $creditReturnService->processReturn($ticketNumber);
+
+            \Log::info('Resultado do processamento', $result);
+
+            if ($result['success']) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Devolução processada com sucesso!',
+                    'ticket' => $ticketNumber
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => $result['message']
+                ], 400);
+            }
+
+        } catch (Exception $e) {
+            \Log::error('Erro ao processar devolução: ' . $e->getMessage(), [
+                'cliente_id' => $clienteId,
+                'ticket' => $ticketNumber,
+                'user_id' => auth()->id() ?? 'system',
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro interno do servidor. Tente novamente. Detalhes: ' . $e->getMessage()
+            ], 500);
         }
     }
 

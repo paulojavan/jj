@@ -99,12 +99,25 @@
                             @endforeach
                         </div>
 
-                        <!-- Botão Ver Compra Completa -->
-                        <div class="text-center">
+                        <!-- Botões de Ação -->
+                        <div class="text-center space-x-2">
                             <a href="{{ route('clientes.compra', [$cliente->id, $ticket->ticket]) }}" 
                                class="btn-green">
                                 <i class="fas fa-eye mr-2"></i>Ver Compra Completa
                             </a>
+                            
+                            @if($ticket->canBeReturned())
+                                <button onclick="confirmarDevolucao('{{ $ticket->ticket }}', '{{ $ticket->valor_formatado }}', {{ $ticket->parcelas }})" 
+                                        class="btn-red">
+                                    <i class="fas fa-undo mr-2"></i>Devolução
+                                </button>
+                            @else
+                                <button class="btn-gray cursor-not-allowed" 
+                                        disabled 
+                                        title="Não é possível devolver esta compra pois há parcelas pagas ou já foi devolvida">
+                                    <i class="fas fa-undo mr-2"></i>Devolução
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -221,6 +234,160 @@ function toggleCard(cardId) {
         card.classList.add('hidden');
         icon.classList.remove('rotate-180');
     }
+}
+
+function confirmarDevolucao(ticket, valor, parcelas) {
+    // Mostrar loading enquanto busca informações
+    Swal.fire({
+        title: 'Carregando informações...',
+        text: 'Por favor, aguarde',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    // Buscar informações do operador e vendedor
+    fetch(`/clientes/{{ $cliente->id }}/venda-info/${ticket}`)
+        .then(response => response.json())
+        .then(data => {
+            const operadorInfo = data.success ? data.operador_caixa : 'Não identificado';
+            const vendedorInfo = data.success ? data.vendedor_atendente : 'Não identificado';
+
+            Swal.fire({
+                title: 'Confirmar Devolução',
+                html: `
+                    <div class="text-left">
+                        <p><strong>Ticket:</strong> ${ticket}</p>
+                        <p><strong>Valor Total:</strong> ${valor}</p>
+                        <p><strong>Parcelas:</strong> ${parcelas}</p>
+                        <br>
+                        <p><strong>Operador de Caixa:</strong> ${operadorInfo}</p>
+                        <p><strong>Vendedor Atendente:</strong> ${vendedorInfo}</p>
+                        <br>
+                        <p class="text-red-600">⚠️ Esta ação não pode ser desfeita!</p>
+                        <p>Tem certeza que deseja processar a devolução desta compra?</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sim, devolver',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processarDevolucao(ticket);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar informações da venda:', error);
+            
+            // Exibir modal mesmo com erro
+            Swal.fire({
+                title: 'Confirmar Devolução',
+                html: `
+                    <div class="text-left">
+                        <p><strong>Ticket:</strong> ${ticket}</p>
+                        <p><strong>Valor Total:</strong> ${valor}</p>
+                        <p><strong>Parcelas:</strong> ${parcelas}</p>
+                        <br>
+                        <p><strong>Operador de Caixa:</strong> Erro ao carregar</p>
+                        <p><strong>Vendedor Atendente:</strong> Erro ao carregar</p>
+                        <br>
+                        <p class="text-red-600">⚠️ Esta ação não pode ser desfeita!</p>
+                        <p>Tem certeza que deseja processar a devolução desta compra?</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sim, devolver',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processarDevolucao(ticket);
+                }
+            });
+        });
+}
+
+function processarDevolucao(ticket) {
+    // Mostrar loading
+    Swal.fire({
+        title: 'Processando devolução...',
+        text: 'Por favor, aguarde',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    // Fazer requisição AJAX
+    const url = `/clientes/{{ $cliente->id }}/devolucao/${ticket}`;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    console.log('URL:', url);
+    console.log('CSRF Token:', csrfToken);
+    
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return response.json();
+    })
+    .then(data => {
+        console.log('Response data:', data);
+        if (data.success) {
+            Swal.fire({
+                title: 'Sucesso!',
+                text: data.message,
+                icon: 'success',
+                confirmButtonColor: '#059669'
+            }).then(() => {
+                // Recarregar a página para atualizar o status
+                window.location.reload();
+            });
+        } else {
+            Swal.fire({
+                title: 'Erro!',
+                text: data.message,
+                icon: 'error',
+                confirmButtonColor: '#dc2626'
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Erro completo:', error);
+        console.error('Tipo do erro:', typeof error);
+        console.error('Stack trace:', error.stack);
+        
+        Swal.fire({
+            title: 'Erro!',
+            text: 'Erro interno do servidor. Tente novamente. Detalhes: ' + error.message,
+            icon: 'error',
+            confirmButtonColor: '#dc2626'
+        });
+    });
 }
 </script>
 

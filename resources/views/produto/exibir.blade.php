@@ -184,23 +184,82 @@ function processReturn(saleId) {
         return;
     }
 
-    // Show confirmation dialog
+    // Mostrar loading enquanto busca informações
     Swal.fire({
-        title: 'Confirmar Devolução',
-        text: 'Tem certeza que deseja processar a devolução deste item?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Sim, devolver',
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (!result.isConfirmed) {
-            return;
+        title: 'Carregando informações...',
+        text: 'Por favor, aguarde',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
         }
-        
-        processReturnConfirmed(saleId);
     });
+
+    // Buscar informações do operador e vendedor
+    fetch(`/produtos/venda-info/${saleId}`)
+        .then(response => response.json())
+        .then(data => {
+            const operadorInfo = data.success ? data.operador_caixa : 'Não identificado';
+            const vendedorInfo = data.success ? data.vendedor_atendente : 'Não identificado';
+
+            // Show confirmation dialog with sale info
+            Swal.fire({
+                title: 'Confirmar Devolução',
+                html: `
+                    <div class="text-left">
+                        <p><strong>ID da Venda:</strong> ${saleId}</p>
+                        <br>
+                        <p><strong>Operador de Caixa:</strong> ${operadorInfo}</p>
+                        <p><strong>Vendedor Atendente:</strong> ${vendedorInfo}</p>
+                        <br>
+                        <p class="text-red-600">⚠️ Esta ação não pode ser desfeita!</p>
+                        <p>Tem certeza que deseja processar a devolução deste item?</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sim, devolver',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processReturnConfirmed(saleId);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar informações da venda:', error);
+            
+            // Exibir modal mesmo com erro
+            Swal.fire({
+                title: 'Confirmar Devolução',
+                html: `
+                    <div class="text-left">
+                        <p><strong>ID da Venda:</strong> ${saleId}</p>
+                        <br>
+                        <p><strong>Operador de Caixa:</strong> Erro ao carregar</p>
+                        <p><strong>Vendedor Atendente:</strong> Erro ao carregar</p>
+                        <br>
+                        <p class="text-red-600">⚠️ Esta ação não pode ser desfeita!</p>
+                        <p>Tem certeza que deseja processar a devolução deste item?</p>
+                    </div>
+                `,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Sim, devolver',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    processReturnConfirmed(saleId);
+                }
+            });
+        });
 }
 
 // Process return after confirmation

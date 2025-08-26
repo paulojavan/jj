@@ -13,6 +13,7 @@ use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Exception;
 
 class ProdutoController extends Controller
 {
@@ -535,6 +536,84 @@ class ProdutoController extends Controller
             DB::rollBack();
             \Log::error("Error processing return: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Erro ao processar devolução.']);
+        }
+    }
+
+    /**
+     * Busca informações da venda (operador de caixa e vendedor atendente)
+     */
+    public function buscarInformacoesVendaProduto(Request $request, $saleId)
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user || !$user->cidade) {
+                return response()->json([
+                    'success' => false,
+                    'operador_caixa' => 'Usuário sem cidade',
+                    'vendedor_atendente' => 'Usuário sem cidade'
+                ]);
+            }
+
+            // Get city name from user's city ID
+            $cidade = DB::table('cidades')->where('id', $user->cidade)->first();
+            if (!$cidade) {
+                return response()->json([
+                    'success' => false,
+                    'operador_caixa' => 'Cidade não encontrada',
+                    'vendedor_atendente' => 'Cidade não encontrada'
+                ]);
+            }
+
+            $nomeCidadeFormatado = strtolower(str_replace(' ', '_', $cidade->cidade));
+            $salesTable = 'vendas_' . $nomeCidadeFormatado;
+
+            // Check if table exists
+            if (!DB::getSchemaBuilder()->hasTable($salesTable)) {
+                return response()->json([
+                    'success' => false,
+                    'operador_caixa' => 'Tabela não encontrada',
+                    'vendedor_atendente' => 'Tabela não encontrada'
+                ]);
+            }
+
+            // Get sale record
+            $sale = DB::table($salesTable)->where('id_vendas', $saleId)->first();
+            if (!$sale) {
+                return response()->json([
+                    'success' => false,
+                    'operador_caixa' => 'Venda não encontrada',
+                    'vendedor_atendente' => 'Venda não encontrada'
+                ]);
+            }
+
+            // Buscar nomes dos usuários
+            $operadorCaixa = 'Não identificado';
+            $vendedorAtendente = 'Não identificado';
+
+            if (isset($sale->id_vendedor) && $sale->id_vendedor) {
+                $operador = DB::table('users')->where('id', $sale->id_vendedor)->first();
+                $operadorCaixa = $operador ? $operador->name : 'ID: ' . $sale->id_vendedor;
+            }
+
+            if (isset($sale->id_vendedor_atendente) && $sale->id_vendedor_atendente) {
+                $vendedor = DB::table('users')->where('id', $sale->id_vendedor_atendente)->first();
+                $vendedorAtendente = $vendedor ? $vendedor->name : 'ID: ' . $sale->id_vendedor_atendente;
+            }
+
+            return response()->json([
+                'success' => true,
+                'operador_caixa' => $operadorCaixa,
+                'vendedor_atendente' => $vendedorAtendente
+            ]);
+
+        } catch (Exception $e) {
+            \Log::error('Erro ao buscar informações da venda: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'operador_caixa' => 'Erro ao buscar',
+                'vendedor_atendente' => 'Erro ao buscar'
+            ]);
         }
     }
 
