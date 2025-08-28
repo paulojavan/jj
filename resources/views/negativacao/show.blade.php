@@ -41,8 +41,9 @@
             <div class="flex items-center space-x-6">
                 <div class="flex-shrink-0">
                     @if($cliente->foto)
+                        @php $pasta = $cliente->pasta ?? $cliente->cpf; @endphp
                         <img class="h-20 w-20 rounded-full object-cover" 
-                             src="{{ asset('storage/fotos_clientes/' . $cliente->foto) }}" 
+                             src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $cliente->foto) }}" 
                              alt="{{ $cliente->nome }}">
                     @else
                         <div class="h-20 w-20 rounded-full bg-gray-300 flex items-center justify-center">

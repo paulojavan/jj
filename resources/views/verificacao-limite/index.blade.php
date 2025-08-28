@@ -668,8 +668,9 @@ function exibirFotoCliente(cliente) {
     const fotoImg = document.getElementById('cliente-foto');
     const semFoto = document.getElementById('sem-foto');
     
-    if (cliente.foto && cliente.pasta) {
-        const urlFoto = `/storage/uploads/clientes/${cliente.pasta}/${cliente.foto}`;
+    if (cliente.foto) {
+        const pasta = cliente.pasta ?? cliente.cpf;
+        const urlFoto = `/storage/uploads/clientes/${pasta}/${cliente.foto}`;
         
         // Testar se a imagem existe
         const img = new Image();
