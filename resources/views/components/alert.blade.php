@@ -1,6 +1,25 @@
+{{-- Sistema de controle de alertas duplicados --}}
+<script>
+    // Limpa flags de alertas quando a página carrega
+    document.addEventListener('DOMContentLoaded', function() {
+        // Reseta flags de alertas para nova página
+        window.alertShown_success = false;
+        window.alertShown_error = false;
+        window.alertShown_warning = false;
+        window.alertShown_info = false;
+        window.alertShown_cpfok = false;
+        window.alertShown_horario_error = false;
+        window.alertShown_validation_errors = false;
+    });
+</script>
+
 @if (session('success'))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Previne alertas duplicados
+        if (window.alertShown_success) return;
+        window.alertShown_success = true;
+        
         function showAlert() {
             if (typeof Swal !== 'undefined') {
                 if (typeof JJAlert !== 'undefined' && window.JJAlertReady) {
@@ -19,14 +38,8 @@
             }
         }
         
-        // Tenta mostrar imediatamente
-        showAlert();
-        
-        // Se JJAlert não estiver pronto, aguarda
-        if (!window.JJAlertReady) {
-            window.addEventListener('JJAlertReady', showAlert);
-            setTimeout(showAlert, 1500); // Fallback final
-        }
+        // Aguarda um pouco para garantir que os scripts estejam carregados
+        setTimeout(showAlert, 300);
     });
 </script>
 @endif
@@ -34,20 +47,15 @@
 @if (session('error'))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Alert component: Erro detectado - {{ session('error') }}');
+        // Previne alertas duplicados
+        if (window.alertShown_error) return;
+        window.alertShown_error = true;
         
         function showAlert() {
-            console.log('Tentando mostrar alerta de erro...');
-            console.log('Swal disponível:', typeof Swal !== 'undefined');
-            console.log('JJAlert disponível:', typeof JJAlert !== 'undefined');
-            console.log('JJAlertReady:', window.JJAlertReady);
-            
             if (typeof Swal !== 'undefined') {
                 if (typeof JJAlert !== 'undefined' && window.JJAlertReady) {
-                    console.log('Usando JJAlert');
                     JJAlert.error('Erro!', "{{ session('error') }}");
                 } else {
-                    console.log('Usando Swal diretamente');
                     Swal.fire({
                         icon: 'error',
                         title: '<strong>Erro!</strong>',
@@ -56,19 +64,10 @@
                         confirmButtonText: '<i class="fas fa-times mr-2"></i>OK'
                     });
                 }
-            } else {
-                console.error('SweetAlert2 não está disponível!');
             }
         }
         
-        // Tenta mostrar imediatamente
-        setTimeout(showAlert, 500);
-        
-        // Tenta novamente após 2 segundos se JJAlert não estiver pronto
-        if (!window.JJAlertReady) {
-            window.addEventListener('JJAlertReady', showAlert);
-            setTimeout(showAlert, 2000);
-        }
+        setTimeout(showAlert, 300);
     });
 </script>
 @endif
@@ -76,6 +75,10 @@
 @if (session('warning'))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Previne alertas duplicados
+        if (window.alertShown_warning) return;
+        window.alertShown_warning = true;
+        
         function showAlert() {
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
@@ -87,7 +90,7 @@
                 });
             }
         }
-        setTimeout(showAlert, 100);
+        setTimeout(showAlert, 300);
     });
 </script>
 @endif
@@ -95,6 +98,10 @@
 @if (session('info'))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Previne alertas duplicados
+        if (window.alertShown_info) return;
+        window.alertShown_info = true;
+        
         function showAlert() {
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
@@ -106,7 +113,7 @@
                 });
             }
         }
-        setTimeout(showAlert, 100);
+        setTimeout(showAlert, 300);
     });
 </script>
 @endif
@@ -114,6 +121,10 @@
 @if (session('cpfok'))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Previne alertas duplicados
+        if (window.alertShown_cpfok) return;
+        window.alertShown_cpfok = true;
+        
         function showAlert() {
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
@@ -127,7 +138,7 @@
                 });
             }
         }
-        setTimeout(showAlert, 100);
+        setTimeout(showAlert, 300);
     });
 </script>
 @endif
@@ -135,6 +146,10 @@
 @if (session('horario_error'))
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Previne alertas duplicados
+        if (window.alertShown_horario_error) return;
+        window.alertShown_horario_error = true;
+        
         function showAlert() {
             if (typeof Swal !== 'undefined') {
                 if (typeof JJAlert !== 'undefined' && window.JJAlertReady) {
@@ -151,12 +166,7 @@
             }
         }
         
-        showAlert();
-        
-        if (!window.JJAlertReady) {
-            window.addEventListener('JJAlertReady', showAlert);
-            setTimeout(showAlert, 1500);
-        }
+        setTimeout(showAlert, 300);
     });
 </script>
 @endif
@@ -170,6 +180,10 @@
 @endphp
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Previne alertas duplicados
+        if (window.alertShown_validation_errors) return;
+        window.alertShown_validation_errors = true;
+        
         function showAlert() {
             if (typeof Swal !== 'undefined') {
                 Swal.fire({
@@ -185,7 +199,7 @@
                 });
             }
         }
-        setTimeout(showAlert, 100);
+        setTimeout(showAlert, 300);
     });
 </script>
 @endif

@@ -124,7 +124,7 @@ class CarrinhoController extends Controller
         if (isset($carrinho[$itemId])) {
             unset($carrinho[$itemId]);
             Session::put('carrinho', $carrinho);
-            
+
             // Se o carrinho ficou vazio, limpa as sessões de desconto
             if (empty($carrinho)) {
                 Session::forget('descontos_aplicados');
@@ -148,7 +148,7 @@ class CarrinhoController extends Controller
                 unset($carrinho[$itemId]);
             }
             Session::put('carrinho', $carrinho);
-            
+
             // Se o carrinho ficou vazio, limpa as sessões de desconto
             if (empty($carrinho)) {
                 Session::forget('descontos_aplicados');
@@ -173,18 +173,18 @@ class CarrinhoController extends Controller
     {
         $tipoDesconto = $request->input('tipo_desconto');
         $total = $this->calcularTotalCarrinho();
-        
+
         // Processa os descontos baseado no tipo selecionado
         $descontosAplicados = $this->processarDescontos($tipoDesconto, $total, $request);
-        
+
         // Armazena informações do cliente e vendedor
         $this->armazenarDadosClienteVendedor($request);
-        
+
         // Armazena valor do dinheiro recebido
         $this->armazenarValorDinheiro($request);
-        
+
         $mensagem = $this->obterMensagemSucesso($tipoDesconto);
-        
+
         return redirect()->back()->with('success', $mensagem);
     }
 
@@ -212,10 +212,10 @@ class CarrinhoController extends Controller
             case 'sem desconto':
                 Session::forget('descontos_aplicados');
                 return null;
-                
+
             case 'manual':
                 return $this->aplicarDescontoManual($request);
-                
+
             default:
                 return $this->aplicarDescontoAutomatico($tipoDesconto, $total);
         }
@@ -246,7 +246,7 @@ class CarrinhoController extends Controller
     private function aplicarDescontoAutomatico($tipoDesconto, $total)
     {
         $descontos = Session::get('descontos');
-        
+
         if (!$descontos) {
             Session::forget('descontos_aplicados');
             return null;
@@ -254,7 +254,7 @@ class CarrinhoController extends Controller
 
         $descontosAplicados = $this->inicializarDescontosZerados($tipoDesconto);
         $configuracaoDesconto = $this->obterConfiguracaoDesconto($tipoDesconto, $descontos);
-        
+
         // Aplica o desconto (mesmo se for 0%)
         $totalComDesconto = $total * (1 - ($configuracaoDesconto['percentual'] / 100));
         $descontosAplicados[$configuracaoDesconto['campo']] = number_format($totalComDesconto, 2, ',', '.');
@@ -346,16 +346,16 @@ class CarrinhoController extends Controller
     {
         $valorDinheiroRecebido = Session::get('valor_dinheiro_recebido', '');
         $descontosAplicados = Session::get('descontos_aplicados', []);
-        
+
         // Calcula o total final considerando descontos
         $totalFinal = $this->obterTotalFinal($totalOriginal, $descontosAplicados);
-        
+
         // Converte valor do dinheiro recebido para float
         $dinheiroRecebidoFloat = $this->converterValorMonetarioParaFloat($valorDinheiroRecebido);
-        
+
         // Calcula o troco
         $valorTroco = $dinheiroRecebidoFloat - $totalFinal;
-        
+
         return [
             'valor_recebido' => $valorDinheiroRecebido,
             'valor_recebido_float' => $dinheiroRecebidoFloat,
@@ -378,7 +378,7 @@ class CarrinhoController extends Controller
         }
 
         $tipoSelecionado = $descontosAplicados['tipo_selecionado'] ?? null;
-        
+
         if (!$tipoSelecionado) {
             return $totalOriginal;
         }
@@ -424,7 +424,7 @@ class CarrinhoController extends Controller
         ];
 
         $campo = $mapeamentoCampos[$tipoSelecionado] ?? $tipoSelecionado;
-        
+
         if (isset($descontosAplicados[$campo])) {
             return $this->converterValorMonetarioParaFloat($descontosAplicados[$campo]);
         }
@@ -443,7 +443,7 @@ class CarrinhoController extends Controller
 
         // Remove "R$" e espaços
         $valor = str_replace(['R$', ' '], '', $valor);
-        
+
         // Se contém vírgula, trata como formato brasileiro (1.234,56)
         if (strpos($valor, ',') !== false) {
             // Remove pontos (separadores de milhares) e substitui vírgula por ponto
@@ -452,7 +452,7 @@ class CarrinhoController extends Controller
             // Se não tem vírgula, assume formato americano ou número inteiro
             $valorLimpo = $valor;
         }
-        
+
         return floatval($valorLimpo);
     }
 
@@ -462,7 +462,7 @@ class CarrinhoController extends Controller
     public function validarPagamento($valorRecebido, $totalFinal)
     {
         $valorRecebidoFloat = $this->converterValorMonetarioParaFloat($valorRecebido);
-        
+
         return [
             'valido' => $valorRecebidoFloat >= $totalFinal,
             'valor_recebido' => $valorRecebidoFloat,
@@ -491,7 +491,7 @@ class CarrinhoController extends Controller
 
         $total = $this->calcularTotalCarrinho();
         $dadosTroco = $this->calcularTroco($total);
-        
+
         return [
             'total_original' => $this->formatarValorBrasileiro($total),
             'total_final' => $this->formatarValorBrasileiro($dadosTroco['total_final']),
@@ -508,21 +508,21 @@ class CarrinhoController extends Controller
         if (empty($valor)) {
             return '0,00';
         }
-        
+
         // Remove caracteres não numéricos exceto vírgula
         $valor = preg_replace('/[^\d,]/', '', $valor);
-        
+
         // Se não tem vírgula, adiciona ,00
         if (strpos($valor, ',') === false) {
             $valor = $valor . ',00';
         }
-        
+
         // Garante que tem pelo menos 2 casas decimais
         $partes = explode(',', $valor);
         if (isset($partes[1]) && strlen($partes[1]) == 1) {
             $valor = $partes[0] . ',' . $partes[1] . '0';
         }
-        
+
         return $valor;
     }
 
@@ -546,7 +546,7 @@ class CarrinhoController extends Controller
 
         // Busca o nome da cidade a partir do ID da cidade do usuário
         $nomeCidade = DB::table('cidades')->where('id', $user->cidade)->value('cidade');
-        
+
         if (!$nomeCidade) {
             throw new \Exception('Cidade do usuário não encontrada ou inválida.');
         }
@@ -559,17 +559,17 @@ class CarrinhoController extends Controller
         ];
 
         $cidadeNormalizada = strtolower(trim($nomeCidade));
-        
+
         // Log para debug
         \Illuminate\Support\Facades\Log::info("Determinando tabela de vendas para cidade: {$nomeCidade} (normalizada: {$cidadeNormalizada})");
-        
+
         if (!isset($mapeamentoCidades[$cidadeNormalizada])) {
             throw new \Exception("Tabela de vendas não configurada para a cidade: {$nomeCidade}. Cidades disponíveis: " . implode(', ', array_keys($mapeamentoCidades)));
         }
 
         $tableName = $mapeamentoCidades[$cidadeNormalizada];
         \Illuminate\Support\Facades\Log::info("Tabela de vendas selecionada: {$tableName}");
-        
+
         return $tableName;
     }
 
@@ -601,7 +601,7 @@ class CarrinhoController extends Controller
         }
 
         $nomeCidade = DB::table('cidades')->where('id', $user->cidade)->value('cidade');
-        
+
         if (!$nomeCidade) {
             return ['valid' => false, 'message' => 'Cidade do usuário não encontrada no sistema.'];
         }
@@ -631,7 +631,7 @@ class CarrinhoController extends Controller
     private function convertPaymentSessionData()
     {
         $descontosAplicados = Session::get('descontos_aplicados', []);
-        
+
         return [
             'avista' => $this->converterValorMonetarioParaFloat($descontosAplicados['avista'] ?? '0,00'),
             'pix' => $this->converterValorMonetarioParaFloat($descontosAplicados['pix'] ?? '0,00'),
@@ -646,10 +646,10 @@ class CarrinhoController extends Controller
     private function validatePaymentData($paymentData)
     {
         $totalPayment = array_sum($paymentData);
-        
+
         \Illuminate\Support\Facades\Log::info('Validando dados de pagamento: ' . json_encode($paymentData));
         \Illuminate\Support\Facades\Log::info('Total de pagamento calculado: ' . $totalPayment);
-        
+
         if ($totalPayment <= 0) {
             return ['valid' => false, 'message' => 'Nenhum valor de pagamento foi informado. Configure os descontos primeiro.'];
         }
@@ -664,11 +664,11 @@ class CarrinhoController extends Controller
     {
         $now = now();
         $totalOriginal = $cartItem['preco'] * $cartItem['quantidade'];
-        
+
         // Calcula o preço de venda com desconto
         $totalPayments = array_sum($paymentDistribution);
         $precoVenda = $totalPayments / $cartItem['quantidade']; // Preço unitário com desconto
-        
+
         // Calcula valores de pagamento individuais (por unidade)
         $valorDinheiroUnitario = ($paymentDistribution['valor_dinheiro'] ?? 0) / $cartItem['quantidade'];
         $valorPixUnitario = ($paymentDistribution['valor_pix'] ?? 0) / $cartItem['quantidade'];
@@ -710,34 +710,34 @@ class CarrinhoController extends Controller
     private function updateProductStock($productId, $quantitySold)
     {
         \Illuminate\Support\Facades\Log::info("Atualizando estoque do produto ID {$productId}, quantidade vendida: {$quantitySold}");
-        
+
         // Primeiro, verifica o estoque atual
         $produto = DB::table('produtos')->where('id', $productId)->first();
-        
+
         if (!$produto) {
             throw new \Exception("Produto ID {$productId} não encontrado.");
         }
-        
+
         // Converte quantidade para inteiro (pode estar como string)
         $estoqueAtual = (int) $produto->quantidade;
         $quantidadeVendida = (int) $quantitySold;
-        
+
         \Illuminate\Support\Facades\Log::info("Estoque atual: {$estoqueAtual}, Quantidade a vender: {$quantidadeVendida}");
-        
+
         if ($estoqueAtual < $quantidadeVendida) {
             throw new \Exception("Estoque insuficiente para produto ID {$productId}. Disponível: {$estoqueAtual}, Solicitado: {$quantidadeVendida}");
         }
-        
+
         // Atualiza a quantidade na tabela produtos
         $novoEstoque = $estoqueAtual - $quantidadeVendida;
         $updated = DB::table('produtos')
             ->where('id', $productId)
             ->update(['quantidade' => (string) $novoEstoque]); // Mantém como string se necessário
-            
+
         if (!$updated) {
             throw new \Exception("Falha ao atualizar estoque do produto ID {$productId}.");
         }
-        
+
         \Illuminate\Support\Facades\Log::info("Estoque do produto ID {$productId} atualizado: {$estoqueAtual} -> {$novoEstoque}");
     }
 
@@ -751,41 +751,41 @@ class CarrinhoController extends Controller
         if (!$nomeCidade) {
             throw new \Exception('Cidade do usuário não encontrada para atualização de estoque.');
         }
-        
+
         $nomeTabela = 'estoque_' . strtolower(str_replace(' ', '_', $nomeCidade));
-        
+
         \Illuminate\Support\Facades\Log::info("Atualizando estoque da tabela {$nomeTabela} - Produto ID {$productId}, Numeração {$numeracao}, Quantidade: {$quantitySold}");
-        
+
         // Primeiro, verifica o estoque atual da numeração
         $estoqueItem = DB::table($nomeTabela)
             ->where('id_produto', $productId)
             ->where('numero', $numeracao)
             ->first();
-            
+
         if (!$estoqueItem) {
             throw new \Exception("Estoque não encontrado para produto ID {$productId}, numeração {$numeracao} na tabela {$nomeTabela}.");
         }
-        
+
         $estoqueAtual = (int) $estoqueItem->quantidade;
         $quantidadeVendida = (int) $quantitySold;
-        
+
         \Illuminate\Support\Facades\Log::info("Estoque atual numeração {$numeracao}: {$estoqueAtual}, Quantidade a vender: {$quantidadeVendida}");
-        
+
         if ($estoqueAtual < $quantidadeVendida) {
             throw new \Exception("Estoque insuficiente para numeração {$numeracao} do produto ID {$productId}. Disponível: {$estoqueAtual}, Solicitado: {$quantidadeVendida}");
         }
-        
+
         // Atualiza a quantidade na tabela de estoque específica da cidade
         $novoEstoque = $estoqueAtual - $quantidadeVendida;
         $updated = DB::table($nomeTabela)
             ->where('id_produto', $productId)
             ->where('numero', $numeracao)
             ->update(['quantidade' => $novoEstoque]);
-            
+
         if (!$updated) {
             throw new \Exception("Falha ao atualizar estoque da numeração {$numeracao} do produto ID {$productId} na tabela {$nomeTabela}.");
         }
-        
+
         \Illuminate\Support\Facades\Log::info("Estoque da tabela {$nomeTabela} atualizado: numeração {$numeracao} {$estoqueAtual} -> {$novoEstoque}");
     }
 
@@ -799,9 +799,9 @@ class CarrinhoController extends Controller
         if (!$nomeCidade) {
             return ['valid' => false, 'message' => 'Cidade do usuário não encontrada para validação de estoque.'];
         }
-        
+
         $nomeTabela = 'estoque_' . strtolower(str_replace(' ', '_', $nomeCidade));
-        
+
         // Agrupa quantidades por produto para validação do estoque geral
         $productQuantities = [];
         foreach ($carrinho as $cartItem) {
@@ -813,36 +813,36 @@ class CarrinhoController extends Controller
             }
             $productQuantities[$cartItem['id']]['total'] += $cartItem['quantidade'];
         }
-        
+
         // Valida estoque geral por produto
         foreach ($productQuantities as $productId => $data) {
             $produtoEstoque = DB::table('produtos')
                 ->where('id', $productId)
                 ->value('quantidade');
-                
+
             if (!$produtoEstoque || $produtoEstoque < $data['total']) {
                 return [
-                    'valid' => false, 
+                    'valid' => false,
                     'message' => "Estoque insuficiente para o produto {$data['nome']}. Disponível: {$produtoEstoque}, Total solicitado: {$data['total']}"
                 ];
             }
         }
-        
+
         // Valida estoque específico por numeração
         foreach ($carrinho as $itemId => $cartItem) {
             $numeracaoEstoque = DB::table($nomeTabela)
                 ->where('id_produto', $cartItem['id'])
                 ->where('numero', $cartItem['numeracao'])
                 ->value('quantidade');
-                
+
             if (!$numeracaoEstoque || $numeracaoEstoque < $cartItem['quantidade']) {
                 return [
-                    'valid' => false, 
+                    'valid' => false,
                     'message' => "Estoque insuficiente para o produto {$cartItem['nome']} na numeração {$cartItem['numeracao']}. Disponível: {$numeracaoEstoque}, Solicitado: {$cartItem['quantidade']}"
                 ];
             }
         }
-        
+
         return ['valid' => true];
     }
 
@@ -891,7 +891,7 @@ class CarrinhoController extends Controller
     public function finalizarCompra(Request $request)
     {
         \Illuminate\Support\Facades\Log::info('Iniciando processo de finalização de compra');
-        
+
         try {
             // Valida todos os dados necessários
             $validation = $this->validatePurchaseData();
@@ -899,7 +899,7 @@ class CarrinhoController extends Controller
                 \Illuminate\Support\Facades\Log::error('Validação falhou: ' . $validation['message']);
                 return redirect()->back()->with('error', $validation['message']);
             }
-            
+
             \Illuminate\Support\Facades\Log::info('Validação passou com sucesso');
 
             $user = $validation['user'];
@@ -935,30 +935,30 @@ class CarrinhoController extends Controller
                     }
                     $productQuantities[$cartItem['id']] += $cartItem['quantidade'];
                 }
-                
+
                 // Atualiza estoque geral dos produtos (uma vez por produto)
                 foreach ($productQuantities as $productId => $totalQuantity) {
                     $this->updateProductStock($productId, $totalQuantity);
                 }
-                
+
                 // Processa cada item do carrinho para vendas e estoque por numeração
                 foreach ($carrinho as $itemId => $cartItem) {
                     // Calcula distribuição de pagamento para este item
                     $paymentDistribution = $this->calculateItemPaymentDistribution(
-                        $cartItem, 
-                        $paymentData, 
+                        $cartItem,
+                        $paymentData,
                         $cartTotal
                     );
 
                     // Cria registro de venda
                     $this->createSalesRecord(
-                        $cartItem, 
-                        $salesTable, 
-                        $paymentDistribution, 
-                        $user, 
+                        $cartItem,
+                        $salesTable,
+                        $paymentDistribution,
+                        $user,
                         $clienteVendedor
                     );
-                    
+
                     // Atualiza estoque específico da numeração na tabela de estoque da cidade
                     $this->updateCityStock($user, $cartItem['id'], $cartItem['numeracao'], $cartItem['quantidade']);
                 }
@@ -976,7 +976,7 @@ class CarrinhoController extends Controller
                 DB::rollback();
                 \Illuminate\Support\Facades\Log::error('Erro ao criar registros de venda: ' . $e->getMessage());
                 \Illuminate\Support\Facades\Log::error('Stack trace: ' . $e->getTraceAsString());
-                
+
                 // Mensagem mais específica baseada no tipo de erro
                 if (strpos($e->getMessage(), 'Integrity constraint violation') !== false) {
                     return redirect()->back()->with('error', 'Erro de integridade dos dados. Verifique se todos os campos obrigatórios estão preenchidos.');
@@ -1002,7 +1002,7 @@ class CarrinhoController extends Controller
         Session::forget('descontos_aplicados');
         Session::forget('cliente_vendedor');
         Session::forget('valor_dinheiro_recebido');
-        
+
         // Limpa também as quantidades disponíveis armazenadas
         $sessionKeys = array_keys(Session::all());
         foreach ($sessionKeys as $key) {
@@ -1041,13 +1041,13 @@ class CarrinhoController extends Controller
     public function pesquisarCliente(Request $request)
     {
         $searchTerm = $request->input('search');
-        
+
         if (empty($searchTerm)) {
             return redirect()->back()->with('error', 'Digite um termo para pesquisar.');
         }
 
         $clientes = $this->searchCustomers($searchTerm);
-        
+
         if ($clientes->isEmpty()) {
             return redirect()->back()->with('error', 'Nenhum cliente encontrado.');
         }
@@ -1139,14 +1139,14 @@ class CarrinhoController extends Controller
     {
         // Busca o cliente
         $cliente = DB::table('clientes')->where('id', $clienteId)->first();
-        
+
         if (!$cliente) {
             return redirect()->route('carrinho.pesquisar-cliente')->with('error', 'Cliente não encontrado.');
         }
 
         // Valida o status do cliente
         $statusValidation = $this->validateCustomerStatus($cliente);
-        
+
         if ($statusValidation['action_type'] !== 'selecionar') {
             return redirect()->route('carrinho.pesquisar-cliente')->with('error', 'Cliente não está disponível para seleção.');
         }
@@ -1172,7 +1172,7 @@ class CarrinhoController extends Controller
     {
         // Busca o limite do cliente
         $cliente = DB::table('clientes')->where('id', $clienteId)->first();
-        
+
         if (!$cliente) {
             return [
                 'available_credit' => 0,
@@ -1212,7 +1212,7 @@ class CarrinhoController extends Controller
     private function checkOverduePayments($clienteId)
     {
         $hoje = now()->toDateString();
-        
+
         $overdueCount = DB::table('parcelas')
             ->where('id_cliente', $clienteId)
             ->where('status', 'aguardando pagamento')
@@ -1244,7 +1244,7 @@ class CarrinhoController extends Controller
     private function validateCreditPurchase($clienteId, $purchaseTotal)
     {
         $creditInfo = $this->calculateAvailableCredit($clienteId);
-        
+
         // Se há parcelas em atraso, não permite a venda
         if ($creditInfo['overdue_payments']) {
             return [
@@ -1258,7 +1258,7 @@ class CarrinhoController extends Controller
         // Se o valor da compra excede o crédito disponível
         if ($purchaseTotal > $creditInfo['available_credit']) {
             $minimumEntry = $this->calculateMinimumEntry($purchaseTotal, $creditInfo['available_credit']);
-            
+
             return [
                 'can_proceed' => true,
                 'requires_entry' => true,
@@ -1331,24 +1331,24 @@ class CarrinhoController extends Controller
     {
         $dates = [];
         $currentDate = now();
-        
+
         // Próximo mês
         $nextMonth = $currentDate->copy()->addMonth();
-        
+
         // Dia 10 do próximo mês
         $dates[] = [
             'value' => '10',
             'label' => $nextMonth->copy()->day(10)->format('d/m/Y') . ' (Dia 10)',
             'date' => $nextMonth->copy()->day(10)->toDateString()
         ];
-        
+
         // Dia 20 do próximo mês
         $dates[] = [
             'value' => '20',
             'label' => $nextMonth->copy()->day(20)->format('d/m/Y') . ' (Dia 20)',
             'date' => $nextMonth->copy()->day(20)->toDateString()
         ];
-        
+
         // Último dia do próximo mês
         $lastDay = $nextMonth->copy()->endOfMonth();
         $dates[] = [
@@ -1356,7 +1356,7 @@ class CarrinhoController extends Controller
             'label' => $lastDay->format('d/m/Y') . ' (Último dia)',
             'date' => $lastDay->toDateString()
         ];
-        
+
         // Dia 10 do mês seguinte
         $monthAfter = $nextMonth->copy()->addMonth();
         $dates[] = [
@@ -1378,7 +1378,7 @@ class CarrinhoController extends Controller
         }
 
         $installmentAmount = ceil($amount / $numberOfInstallments);
-        
+
         // Verifica se o valor da parcela é pelo menos R$ 20
         if ($installmentAmount < 20) {
             throw new \Exception('Valor da parcela deve ser no mínimo R$ 20,00');
@@ -1443,7 +1443,7 @@ class CarrinhoController extends Controller
         }
 
         $installmentAmount = ceil($amount / $numberOfInstallments);
-        
+
         if ($installmentAmount < 20) {
             return [
                 'valid' => false,
@@ -1464,36 +1464,36 @@ class CarrinhoController extends Controller
     {
         $maxAttempts = 100; // Limite de tentativas para evitar loop infinito
         $attempts = 0;
-        
+
         do {
             $attempts++;
-            
+
             // Formato: TK + YYYYMMDD + HHMMSS + 4 caracteres aleatórios = 20 caracteres
             $timestamp = now();
             $date = $timestamp->format('Ymd'); // 8 caracteres (ex: 20250810)
             $time = $timestamp->format('His'); // 6 caracteres (ex: 143052)
-            
+
             // Gera 4 caracteres aleatórios (números e letras para maior variabilidade)
             $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
             $random = '';
             for ($i = 0; $i < 4; $i++) {
                 $random .= $characters[rand(0, strlen($characters) - 1)];
             }
-            
+
             $ticket = 'TK' . $date . $time . $random; // Total: 2 + 8 + 6 + 4 = 20 caracteres
-            
+
             // Verifica se o ticket já existe na tabela
             $exists = DB::table('tickets')->where('ticket', $ticket)->exists();
-            
+
             // Se exceder o limite de tentativas, adiciona microsegundos para garantir unicidade
             if ($attempts >= $maxAttempts) {
                 $microtime = str_pad(substr(microtime(true) * 1000000, -4), 4, '0', STR_PAD_LEFT);
                 $ticket = 'TK' . $date . substr($time, 0, 2) . $microtime . substr($random, 0, 4);
                 $exists = DB::table('tickets')->where('ticket', $ticket)->exists();
             }
-            
+
         } while ($exists && $attempts < ($maxAttempts + 10));
-        
+
         // Log para debug se necessário
         if ($attempts > 1) {
             \Illuminate\Support\Facades\Log::info("Ticket gerado após {$attempts} tentativas: {$ticket}");
@@ -1524,7 +1524,7 @@ class CarrinhoController extends Controller
     private function createInstallmentRecords($installmentData)
     {
         $user = \Illuminate\Support\Facades\Auth::user();
-        
+
         // Busca o nome da cidade para o campo bd
         $nomeCidade = DB::table('cidades')->where('id', $user->cidade)->value('cidade');
         $bdValue = 'vendas_' . strtolower(str_replace(' ', '_', $nomeCidade));
@@ -1570,7 +1570,7 @@ class CarrinhoController extends Controller
         $valorEntrada = $this->converterValorMonetarioParaFloat($formData['valor_entrada'] ?? '0');
         $valorFinanciar = $totalCompra - $valorEntrada;
         $quantidadeParcelas = (int) $formData['quantidade_parcelas'];
-        
+
         // Valida a configuração das parcelas
         $validation = $this->validateInstallmentConfiguration($valorFinanciar, $quantidadeParcelas);
         if (!$validation['valid']) {
@@ -1583,7 +1583,7 @@ class CarrinhoController extends Controller
         // Determina a data da primeira parcela
         $dayType = $formData['data_vencimento'];
         $firstDate = $this->getFirstPaymentDate($dayType);
-        
+
         // Gera as datas de vencimento
         $dates = $this->generateInstallmentDates($firstDate, $quantidadeParcelas, $dayType);
 
@@ -1603,7 +1603,7 @@ class CarrinhoController extends Controller
     private function getFirstPaymentDate($dayType)
     {
         $nextMonth = now()->addMonth();
-        
+
         switch ($dayType) {
             case '10':
                 return $nextMonth->day(10)->toDateString();
@@ -1684,9 +1684,9 @@ class CarrinhoController extends Controller
         } catch (\Exception $e) {
             // Rollback em caso de erro
             DB::rollback();
-            
+
             \Illuminate\Support\Facades\Log::error('Erro ao processar venda crediário: ' . $e->getMessage());
-            
+
             return redirect()->back()->with('error', 'Erro ao processar venda crediário: ' . $e->getMessage());
         }
     }
@@ -1721,21 +1721,21 @@ class CarrinhoController extends Controller
             // Obter ID do cliente antes de limpar as sessões
             $clienteCrediario = Session::get('cliente_crediario');
             $clienteId = $clienteCrediario['id'] ?? null;
-            
+
             // Atualizar campo ociosidade do cliente com a data atual
             if ($clienteId) {
                 \App\Models\Cliente::where('id', $clienteId)->update([
                     'ociosidade' => now()->toDateString()
                 ]);
             }
-            
+
             // Limpa as sessões
             $this->clearCreditSaleSessions();
 
             // Redirecionar para detalhamento da compra
             if ($clienteId) {
                 return redirect()->route('clientes.compra', [
-                    'id' => $clienteId, 
+                    'id' => $clienteId,
                     'ticket' => $vendaCrediarioData['ticket']
                 ])->with('success', 'Venda crediário realizada com sucesso!');
             } else {
@@ -1786,32 +1786,32 @@ class CarrinhoController extends Controller
     {
         $user = \Illuminate\Support\Facades\Auth::user();
         $carrinho = Session::get('carrinho', []);
-        
+
         // Determina a tabela de vendas
         $salesTable = $this->determineSalesTable($user);
-        
+
         // Valida a tabela de vendas
         $this->validateSalesTable($salesTable);
-        
+
         // Converte dados de pagamento
         $paymentData = $this->convertPaymentSessionData();
-        
+
         // Valida dados de pagamento
         $paymentValidation = $this->validatePaymentData($paymentData);
         if (!$paymentValidation['valid']) {
             throw new \Exception($paymentValidation['message']);
         }
-        
+
         $cartTotal = $this->calcularTotalCarrinho();
         $clienteVendedor = Session::get('cliente_vendedor', []);
-        
+
         // Processa cada item do carrinho
         foreach ($carrinho as $itemId => $cartItem) {
             $paymentDistribution = $this->calculateItemPaymentDistribution($cartItem, $paymentData, $cartTotal);
-            
+
             // Cria registro de venda com o ticket
             $this->createSalesRecordWithTicket($cartItem, $salesTable, $paymentDistribution, $user, $clienteVendedor, $vendaCrediarioData['ticket']);
-            
+
             // Atualiza estoques
             $this->updateProductStock($cartItem['id'], $cartItem['quantidade']);
             $this->updateCityStock($user, $cartItem['id'], $cartItem['numeracao'], $cartItem['quantidade']);
@@ -1825,11 +1825,11 @@ class CarrinhoController extends Controller
     {
         $now = now();
         $totalOriginal = $cartItem['preco'] * $cartItem['quantidade'];
-        
+
         // Calcula o preço de venda com desconto
         $totalPayments = array_sum($paymentDistribution);
         $precoVenda = $totalPayments / $cartItem['quantidade']; // Preço unitário com desconto
-        
+
         // Calcula valores de pagamento individuais (por unidade)
         $valorDinheiroUnitario = ($paymentDistribution['valor_dinheiro'] ?? 0) / $cartItem['quantidade'];
         $valorPixUnitario = ($paymentDistribution['valor_pix'] ?? 0) / $cartItem['quantidade'];
@@ -1876,7 +1876,7 @@ class CarrinhoController extends Controller
         Session::forget('descontos_aplicados');
         Session::forget('cliente_vendedor');
         Session::forget('valor_dinheiro_recebido');
-        
+
         // Limpa também as quantidades disponíveis armazenadas
         $sessionKeys = array_keys(Session::all());
         foreach ($sessionKeys as $key) {
@@ -1892,7 +1892,7 @@ class CarrinhoController extends Controller
     private function processPostSaleModifications($vendaCrediarioData)
     {
         \Illuminate\Support\Facades\Log::info("ProcessPostSaleModifications - Iniciando modificações pós-venda");
-        
+
         $clienteCrediario = Session::get('cliente_crediario');
         if (!$clienteCrediario || !isset($clienteCrediario['id'])) {
             \Illuminate\Support\Facades\Log::error("ProcessPostSaleModifications - Cliente crediário não encontrado na sessão");
@@ -1901,15 +1901,15 @@ class CarrinhoController extends Controller
 
         $clienteId = $clienteCrediario['id'];
         \Illuminate\Support\Facades\Log::info("ProcessPostSaleModifications - Cliente ID: {$clienteId}");
-        
+
         // 1. Verificar se entrada foi obrigatória e aumentar limite
         \Illuminate\Support\Facades\Log::info("ProcessPostSaleModifications - Processando aumento de limite");
         $this->processLimitIncrease($clienteId, $vendaCrediarioData);
-        
+
         // 2. Definir token como NULL
         \Illuminate\Support\Facades\Log::info("ProcessPostSaleModifications - Limpando token do cliente");
         $this->clearClientToken($clienteId);
-        
+
         \Illuminate\Support\Facades\Log::info("ProcessPostSaleModifications - Modificações pós-venda concluídas");
     }
 
@@ -1920,9 +1920,9 @@ class CarrinhoController extends Controller
     {
         // Verificar se houve entrada
         $valorEntrada = $vendaCrediarioData['valor_entrada'] ?? 0;
-        
+
         \Illuminate\Support\Facades\Log::info("ProcessLimitIncrease - Cliente ID: {$clienteId}, Valor entrada: R$ " . number_format($valorEntrada, 2, ',', '.'));
-        
+
         if ($valorEntrada > 0) {
             // Buscar informações atuais do cliente
             $cliente = DB::table('clientes')->where('id', $clienteId)->first();
@@ -1930,20 +1930,20 @@ class CarrinhoController extends Controller
                 \Illuminate\Support\Facades\Log::error("ProcessLimitIncrease - Cliente ID {$clienteId} não encontrado");
                 return;
             }
-            
+
             \Illuminate\Support\Facades\Log::info("ProcessLimitIncrease - Cliente encontrado. Limite atual: R$ " . number_format($cliente->limite, 2, ',', '.'));
-            
+
             // SIMPLIFICADO: Se há entrada, sempre aumentar o limite
             // (assumindo que se há entrada, ela era obrigatória)
             $limiteAtual = (float) $cliente->limite;
             $novoLimite = $limiteAtual + $valorEntrada;
-            
+
             \Illuminate\Support\Facades\Log::info("ProcessLimitIncrease - Aumentando limite de R$ " . number_format($limiteAtual, 2, ',', '.') . " para R$ " . number_format($novoLimite, 2, ',', '.'));
-            
+
             $updated = DB::table('clientes')
                 ->where('id', $clienteId)
                 ->update(['limite' => $novoLimite]);
-                
+
             if ($updated) {
                 \Illuminate\Support\Facades\Log::info("ProcessLimitIncrease - Limite do cliente ID {$clienteId} aumentado em R$ " . number_format($valorEntrada, 2, ',', '.') . " após finalização da venda. Novo limite: R$ " . number_format($novoLimite, 2, ',', '.'));
             } else {
@@ -1962,7 +1962,7 @@ class CarrinhoController extends Controller
         DB::table('clientes')
             ->where('id', $clienteId)
             ->update(['token' => null]);
-            
+
         \Illuminate\Support\Facades\Log::info("Token do cliente ID {$clienteId} foi definido como NULL após finalização da venda.");
     }
 }

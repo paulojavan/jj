@@ -475,11 +475,25 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function toggleManualMode() {
-    const tipoDesconto = document.getElementById('tipo_desconto').value;
+    console.log('toggleManualMode chamada');
+    
+    const tipoDesconto = document.getElementById('tipo_desconto');
+    if (!tipoDesconto) {
+        console.error('Elemento tipo_desconto não encontrado');
+        return;
+    }
+    
+    const tipoDescontoValue = tipoDesconto.value;
     const paymentFields = document.querySelectorAll('.payment-field');
-    const isManual = tipoDesconto === 'manual';
+    const isManual = tipoDescontoValue === 'manual';
+    
+    console.log('Tipo desconto:', tipoDescontoValue);
+    console.log('É manual:', isManual);
+    console.log('Campos encontrados:', paymentFields.length);
     
     paymentFields.forEach(function(field) {
+        console.log('Processando campo:', field.id);
+        
         if (isManual) {
             field.readOnly = false;
             field.classList.remove('bg-gray-100');
@@ -490,11 +504,13 @@ function toggleManualMode() {
             if (field.value === '0,00') {
                 field.value = '';
             }
+            console.log('Campo habilitado para edição:', field.id);
         } else {
             field.readOnly = true;
             field.classList.remove('bg-white');
             field.classList.add('bg-gray-100');
             field.style.cursor = 'not-allowed';
+            console.log('Campo desabilitado:', field.id);
         }
     });
     
@@ -502,18 +518,25 @@ function toggleManualMode() {
     if (!isManual) {
         document.querySelectorAll('input[name$="_manual"]').forEach(function(hiddenField) {
             hiddenField.value = '0,00';
+            console.log('Campo hidden zerado:', hiddenField.name);
         });
     }
 }
 
 // SweetAlert2 para confirmação de finalização de compra
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Inicializando botão de finalizar compra...');
+    
     const finalizeButton = document.getElementById('finalize-button');
     const finalizeForm = document.getElementById('finalize-form');
+    
+    console.log('Botão encontrado:', !!finalizeButton);
+    console.log('Formulário encontrado:', !!finalizeForm);
     
     if (finalizeButton && finalizeForm) {
         finalizeButton.addEventListener('click', function(e) {
             e.preventDefault();
+            console.log('Botão de finalizar clicado');
             
             // Calcular informações da compra para exibir no SweetAlert
             const totalElement = document.querySelector('.text-2xl.font-bold.text-red-600');
@@ -522,84 +545,68 @@ document.addEventListener('DOMContentLoaded', function() {
             // Contar itens no carrinho
             const cartItems = document.querySelectorAll('.table-row').length;
             
-            JJAlert.finalizarCompra(cartItems, totalValue)tons: true,
-                focusCancel: true,
-                customClass: {
-                    popup: 'swal2-popup-custom',
-                    title: 'swal2-title-custom',
-                    confirmButton: 'swal2-confirm-custom',
-                    cancelButton: 'swal2-cancel-custom'
-                },
-                buttonsStyling: false
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Mostrar loading
+            console.log('Total de itens:', cartItems);
+            console.log('Valor total:', totalValue);
+            console.log('JJAlert disponível:', typeof JJAlert !== 'undefined');
+            
+            // Verifica se JJAlert está disponível
+            if (typeof JJAlert !== 'undefined' && JJAlert.finalizarCompra) {
+                console.log('Usando JJAlert.finalizarCompra');
+                JJAlert.finalizarCompra(cartItems, totalValue).then((result) => {
+                    if (result.isConfirmed) {
+                        console.log('Usuário confirmou, submetendo formulário');
+                        finalizeForm.submit();
+                    }
+                });
+            } else {
+                console.log('JJAlert não disponível, usando Swal diretamente');
+                // Fallback para Swal direto
+                if (typeof Swal !== 'undefined') {
                     Swal.fire({
-                        title: 'Processando...',
-                        html: '<i class="fas fa-spinner fa-spin text-3xl text-blue-500"></i><br><br>Finalizando sua compra, aguarde...',
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        showConfirmButton: false,
-                        customClass: {
-                            popup: 'swal2-popup-custom'
+                        title: '<strong>Finalizar Compra</strong>',
+                        html: `
+                            <div class="text-left">
+                                <div class="mb-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-semibold text-gray-700">Total de itens:</span>
+                                        <span class="font-bold text-red-600">${cartItems}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="font-semibold text-gray-700">Valor total:</span>
+                                        <span class="font-bold text-green-600 text-lg">${totalValue}</span>
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 text-center">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                                    Esta ação não pode ser desfeita!
+                                </p>
+                            </div>
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#16a34a',
+                        cancelButtonColor: '#dc2626',
+                        confirmButtonText: '<i class="fas fa-check mr-2"></i>Sim, finalizar!',
+                        cancelButtonText: '<i class="fas fa-times mr-2"></i>Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            console.log('Usuário confirmou, submetendo formulário');
+                            finalizeForm.submit();
                         }
                     });
-                    
-                    // Submeter o formulário
-                    finalizeForm.submit();
+                } else {
+                    console.error('Nem JJAlert nem Swal estão disponíveis');
+                    // Fallback final - confirmação simples
+                    if (confirm(`Finalizar compra?\n\nItens: ${cartItems}\nTotal: ${totalValue}\n\nEsta ação não pode ser desfeita!`)) {
+                        finalizeForm.submit();
+                    }
                 }
-            });
+            }
         });
+    } else {
+        console.error('Botão ou formulário de finalizar não encontrados');
     }
 });
 </script>
-
-<!-- SweetAlert2 CSS e JS -->
-<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.32/dist/sweetalert2.all.min.js"></script>
-
-<!-- Estilos customizados para SweetAlert2 -->
-<style>
-.swal2-popup-custom {
-    border-radius: 15px !important;
-    padding: 2rem !important;
-}
-
-.swal2-title-custom {
-    color: #dc2626 !important;
-    font-size: 1.5rem !important;
-}
-
-.swal2-confirm-custom {
-    background-color: #16a34a !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 8px !important;
-    padding: 12px 24px !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-}
-
-.swal2-confirm-custom:hover {
-    background-color: #15803d !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4) !important;
-}
-
-.swal2-cancel-custom {
-    background-color: #dc2626 !important;
-    color: white !important;
-    border: none !important;
-    border-radius: 8px !important;
-    padding: 12px 24px !important;
-    font-weight: 600 !important;
-    transition: all 0.3s ease !important;
-    margin-right: 10px !important;
-}
-
-.swal2-cancel-custom:hover {
-    background-color: #b91c1c !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4) !important;
-}
 </style>

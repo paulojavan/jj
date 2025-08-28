@@ -3,6 +3,12 @@
  * JJ Calçados - Sistema de Gestão
  */
 
+// Previne execução múltipla
+if (window.JJAlertConfigLoaded) {
+    console.log('JJAlert config já foi carregado');
+} else {
+    window.JJAlertConfigLoaded = true;
+
 // Função para aguardar SweetAlert2 estar disponível
 function waitForSwal(callback, maxAttempts = 50) {
     let attempts = 0;
@@ -219,6 +225,11 @@ window.JJAlert.finalizarCompra = (totalItens, valorTotal) => {
     // Marca que JJAlert está pronto
     window.JJAlertReady = true;
     
-    // Dispara evento personalizado para indicar que JJAlert está pronto
-    window.dispatchEvent(new CustomEvent('JJAlertReady'));
+    // Dispara evento personalizado para indicar que JJAlert está pronto (apenas uma vez)
+    if (!window.JJAlertEventDispatched) {
+        window.JJAlertEventDispatched = true;
+        window.dispatchEvent(new CustomEvent('JJAlertReady'));
+    }
 });
+
+} // Fim da proteção contra execução múltipla
