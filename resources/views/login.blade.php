@@ -6,8 +6,8 @@
     <title>JJ Calçados - Login</title>
     <link rel="icon" href="{{ asset('storage/uploads/sistema/icon.png') }}">
     @vite('resources/css/app.css')
-    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite('resources/js/sweetalert-config.js')
 </head>
 <body class="min-h-screen bg-gradient-to-br from-yellow-400 via-yellow-500 to-red-500 flex items-center justify-center p-4">
@@ -30,7 +30,7 @@
                     </div>
                 </div><br><br><BR>
                 <div class="mt-8">
-                    <h1 class="text-2xl font-bold text-white mb-1">JJ Calçados</h1>
+                    <h1 class="text-2xl font-bold text-white mb-1">Joécio Calçados</h1>
                     <p class="text-yellow-200 text-sm">Sistema de Gestão</p>
                 </div>
             </div>
@@ -152,7 +152,7 @@
             }
         }
 
-        // Animação de entrada
+        // Animação de entrada e alertas
         document.addEventListener('DOMContentLoaded', function() {
             const loginCard = document.querySelector('.bg-white');
             loginCard.style.opacity = '0';
@@ -163,20 +163,9 @@
                 loginCard.style.opacity = '1';
                 loginCard.style.transform = 'translateY(0)';
             }, 100);
+
+            // Os alertas agora são gerenciados pelo componente x-alert
         });
-
-        // Alertas personalizados usando JJAlert
-        @if(session('horario_error'))
-            JJAlert.error('Acesso Negado', '{{ session('horario_error') }}');
-        @endif
-
-        @if(session('success'))
-            JJAlert.success('Sucesso!', '{{ session('success') }}');
-        @endif
-
-        @if(session('error'))
-            JJAlert.error('Erro!', '{{ session('error') }}');
-        @endif
     </script>
 </body>
 </html>

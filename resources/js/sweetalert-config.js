@@ -3,8 +3,26 @@
  * JJ Calçados - Sistema de Gestão
  */
 
-// Configurações padrão para todos os alertas
-const defaultSwalConfig = {
+// Função para aguardar SweetAlert2 estar disponível
+function waitForSwal(callback, maxAttempts = 50) {
+    let attempts = 0;
+    const checkSwal = () => {
+        if (typeof Swal !== 'undefined') {
+            callback();
+        } else if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(checkSwal, 100);
+        } else {
+            console.error('SweetAlert2 não pôde ser carregado após', maxAttempts, 'tentativas');
+        }
+    };
+    checkSwal();
+}
+
+// Inicializa quando SweetAlert2 estiver disponível
+waitForSwal(() => {
+    // Configurações padrão para todos os alertas
+    const defaultSwalConfig = {
     customClass: {
         popup: 'swal2-popup-jj',
         title: 'swal2-title-jj',
@@ -197,3 +215,10 @@ window.JJAlert.finalizarCompra = (totalItens, valorTotal) => {
         ...defaultSwalConfig
     });
 };
+
+    // Marca que JJAlert está pronto
+    window.JJAlertReady = true;
+    
+    // Dispara evento personalizado para indicar que JJAlert está pronto
+    window.dispatchEvent(new CustomEvent('JJAlertReady'));
+});
