@@ -257,6 +257,10 @@ class CarrinhoController extends Controller
 
         // Aplica o desconto (mesmo se for 0%)
         $totalComDesconto = $total * (1 - ($configuracaoDesconto['percentual'] / 100));
+        
+        // Arredonda para o próximo número inteiro
+        $totalComDesconto = ceil($totalComDesconto);
+        
         $descontosAplicados[$configuracaoDesconto['campo']] = number_format($totalComDesconto, 2, ',', '.');
 
         Session::put('descontos_aplicados', $descontosAplicados);
@@ -405,6 +409,9 @@ class CarrinhoController extends Controller
                 $total += $this->converterValorMonetarioParaFloat($descontosAplicados[$campo]);
             }
         }
+
+        // Arredonda para o próximo número inteiro
+        $total = ceil($total);
 
         return $total;
     }

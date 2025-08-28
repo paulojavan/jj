@@ -103,6 +103,14 @@
                         </div>
                     </div>
 
+                    <div class="mb-4">
+                        <label for="dinheiro_recebido" class="block text-sm font-medium text-gray-700">Dinheiro Recebido</label>
+                        <input type="text" name="dinheiro_recebido" id="dinheiro_recebido" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm money">
+                        <div id="troco" class="mt-2 text-lg font-bold text-green-600" style="display: none;">
+                            Troco: <span id="valor_troco">R$ 0,00</span>
+                        </div>
+                    </div>
+
                     <button type="submit" id="btn-pagar" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400" disabled>Realizar Pagamento</button>
                 </div>
             </form>
@@ -148,12 +156,17 @@
             }
 
             function clearPayments() {
-                $('#dinheiro, #pix, #cartao').val('');
+                $('#dinheiro, #pix, #cartao, #dinheiro_recebido').val('');
                 checkPaymentAbility();
+                $('#valor_troco').text('R$ 0,00');
+                $('#troco').hide();
             }
 
             $('.parcela-checkbox').on('change', updateTotal);
-            $('#dinheiro, #pix, #cartao').on('input', checkPaymentAbility);
+            $('#dinheiro, #pix, #cartao, #dinheiro_recebido').on('input', function() {
+                checkPaymentAbility();
+                calcularTroco();
+            });
 
             // Botões de seleção
             $('#btn-selecionar-todas').on('click', function() {
@@ -166,6 +179,25 @@
                 updateTotal();
                 clearPayments();
             });
+
+            function calcularTroco() {
+                const totalSelecionado = parseFloat($('#total-selecionado').text().replace(/[^0-9,-]+/g, '').replace(',', '.'));
+                const dinheiroRecebido = parseCurrency($('#dinheiro_recebido').val());
+                
+                if (dinheiroRecebido > 0) {
+                    const troco = dinheiroRecebido - totalSelecionado;
+                    if (troco >= 0) {
+                        $('#valor_troco').text(formatCurrency(troco));
+                        $('#troco').show();
+                    } else {
+                        $('#valor_troco').text('R$ 0,00');
+                        $('#troco').hide();
+                    }
+                } else {
+                    $('#valor_troco').text('R$ 0,00');
+                    $('#troco').hide();
+                }
+            }
             
             // Intercept form submission to show confirmation
             $('#payment-form').on('submit', function(e) {
@@ -175,6 +207,8 @@
                 const pix = parseCurrency($('#pix').val());
                 const cartao = parseCurrency($('#cartao').val());
                 const total = dinheiro + pix + cartao;
+                const dinheiroRecebido = parseCurrency($('#dinheiro_recebido').val());
+                const troco = dinheiroRecebido - total;
                 
                 let metodo = 'Dinheiro';
                 if (pix > 0 && cartao > 0) {
@@ -186,15 +220,17 @@
                 }
                 
                 Swal.fire({
-                    title: 'Confirmar Pagamento',
-                    html: `
-                        <p><strong>Total a pagar:</strong> ${formatCurrency(total)}</p>
-                        <p><strong>Método de pagamento:</strong> ${metodo}</p>
-                    `,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonText: 'Confirmar',
-                    cancelButtonText: 'Cancelar'
+                        title: 'Confirmar Pagamento',
+                        html: `
+                            <p><strong>Total a pagar:</strong> ${formatCurrency(total)}</p>
+                            <p><strong>Método de pagamento:</strong> ${metodo}</p>
+                            ${dinheiroRecebido > 0 ? `<p><strong>Dinheiro recebido:</strong> ${formatCurrency(dinheiroRecebido)}</p>` : ''}
+                            ${troco > 0 ? `<p><strong>Troco:</strong> ${formatCurrency(troco)}</p>` : ''}
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Confirmar',
+                        cancelButtonText: 'Cancelar'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // Submit the form

@@ -105,7 +105,7 @@
 
             <form action="{{ route('carrinho.aplicarDesconto') }}" method="POST">
                 @csrf
-                
+
                 <!-- Tipo de Desconto -->
                 <div class="mb-6">
                     <label for="tipo_desconto" class="block text-sm font-semibold text-red-600 mb-2">
@@ -131,8 +131,8 @@
                         <label for="valor_avista" class="flex items-center text-sm font-semibold text-yellow-700 mb-2">
                             <i class="fas fa-money-bill-wave mr-2"></i>Valor à Vista
                         </label>
-                        <input type="text" name="valor_avista" id="valor_avista" 
-                               class="form-input payment-field border-yellow-300 focus:border-yellow-500" 
+                        <input type="text" name="valor_avista" id="valor_avista"
+                               class="form-input payment-field border-yellow-300 focus:border-yellow-500"
                                value="{{ Session::get('descontos_aplicados.avista', '0,00') }}" readonly>
                         <input type="hidden" name="valor_avista_manual" id="valor_avista_manual" value="{{ Session::get('descontos_aplicados.avista', '0,00') }}">
                     </div>
@@ -142,8 +142,8 @@
                         <label for="valor_pix" class="flex items-center text-sm font-semibold text-green-700 mb-2">
                             <i class="fas fa-mobile-alt mr-2"></i>Valor PIX
                         </label>
-                        <input type="text" name="valor_pix" id="valor_pix" 
-                               class="form-input payment-field border-green-300 focus:border-green-500" 
+                        <input type="text" name="valor_pix" id="valor_pix"
+                               class="form-input payment-field border-green-300 focus:border-green-500"
                                value="{{ Session::get('descontos_aplicados.pix', '0,00') }}" readonly>
                         <input type="hidden" name="valor_pix_manual" id="valor_pix_manual" value="{{ Session::get('descontos_aplicados.pix', '0,00') }}">
                     </div>
@@ -158,8 +158,8 @@
                                 <span class="ml-1 text-xs">(Débito {{ $descontos->debito ?? 0 }}%)</span>
                             @endif
                         </label>
-                        <input type="text" name="valor_cartao" id="valor_cartao" 
-                               class="form-input payment-field border-blue-300 focus:border-blue-500" 
+                        <input type="text" name="valor_cartao" id="valor_cartao"
+                               class="form-input payment-field border-blue-300 focus:border-blue-500"
                                value="{{ Session::get('descontos_aplicados.cartao', '0,00') }}" readonly>
                         <input type="hidden" name="valor_cartao_manual" id="valor_cartao_manual" value="{{ Session::get('descontos_aplicados.cartao', '0,00') }}">
                     </div>
@@ -169,8 +169,8 @@
                         <label for="valor_crediario" class="flex items-center text-sm font-semibold text-purple-700 mb-2">
                             <i class="fas fa-calendar-alt mr-2"></i>Valor Crediário
                         </label>
-                        <input type="text" name="valor_crediario" id="valor_crediario" 
-                               class="form-input payment-field border-purple-300 focus:border-purple-500" 
+                        <input type="text" name="valor_crediario" id="valor_crediario"
+                               class="form-input payment-field border-purple-300 focus:border-purple-500"
                                value="{{ Session::get('descontos_aplicados.crediario', '0,00') }}" readonly>
                         <input type="hidden" name="valor_crediario_manual" id="valor_crediario_manual" value="{{ Session::get('descontos_aplicados.crediario', '0,00') }}">
                     </div>
@@ -182,9 +182,9 @@
                         <label for="valor_dinheiro" class="flex items-center text-sm font-semibold text-red-600 mb-2">
                             <i class="fas fa-hand-holding-usd mr-2"></i>Dinheiro Recebido
                         </label>
-                        <input type="text" name="valor_dinheiro" id="valor_dinheiro" 
-                               class="form-input border-red-300 focus:border-red-500" 
-                               value="{{ Session::get('valor_dinheiro_recebido', '') }}" 
+                        <input type="text" name="valor_dinheiro" id="valor_dinheiro"
+                               class="form-input border-red-300 focus:border-red-500"
+                               value="{{ Session::get('valor_dinheiro_recebido', '') }}"
                                placeholder="R$ 0,00">
                     </div>
 
@@ -192,8 +192,8 @@
                         <label for="nome_cliente" class="flex items-center text-sm font-semibold text-red-600 mb-2">
                             <i class="fas fa-user mr-2"></i>Nome do Cliente
                         </label>
-                        <input type="text" name="nome_cliente" id="nome_cliente" 
-                               class="form-input border-red-300 focus:border-red-500" 
+                        <input type="text" name="nome_cliente" id="nome_cliente"
+                               class="form-input border-red-300 focus:border-red-500"
                                value="{{ $clienteVendedor['nome_cliente'] ?? '' }}"
                                placeholder="Digite o nome do cliente">
                     </div>
@@ -204,7 +204,7 @@
                     <label for="vendedor_atendente" class="flex items-center text-sm font-semibold text-red-600 mb-2">
                         <i class="fas fa-user-tie mr-2"></i>Vendedor Atendente
                     </label>
-                    <select name="vendedor_atendente" id="vendedor_atendente" 
+                    <select name="vendedor_atendente" id="vendedor_atendente"
                             class="form-input border-red-300 focus:border-red-500" required>
                         <option value="">Selecione o vendedor atendente</option>
                         @foreach($vendedores as $vendedor)
@@ -242,7 +242,7 @@
                     $tipoSelecionado = Session::get('descontos_aplicados.tipo_selecionado');
                     $totalExibir = $total;
                     $descontoAplicado = 0;
-                    
+
                     if ($tipoSelecionado) {
                         if ($tipoSelecionado === 'manual') {
                             // No modo manual, soma todos os valores preenchidos
@@ -307,13 +307,13 @@
                     <i class="fas fa-trash mr-2"></i>Limpar Carrinho
                 </button>
             </form>
-            
+
             @php
                 // Verifica se há algum desconto aplicado com valor maior que 0
                 $descontosAplicados = Session::get('descontos_aplicados', []);
                 $temDescontoAplicado = false;
                 $valorCrediario = 0;
-                
+
                 if (!empty($descontosAplicados)) {
                     foreach (['avista', 'pix', 'cartao', 'crediario'] as $tipo) {
                         if (isset($descontosAplicados[$tipo])) {
@@ -328,7 +328,7 @@
                     }
                 }
             @endphp
-            
+
             <!-- Botões de Finalização -->
             @if($temDescontoAplicado)
                 <div class="flex flex-col sm:flex-row gap-3">
@@ -358,7 +358,7 @@
                     <h3 class="text-2xl font-bold text-red-600 mb-2">Carrinho Vazio</h3>
                     <p class="text-gray-600">Nenhum item foi adicionado ao carrinho ainda.</p>
                 </div>
-                
+
                 <div class="space-y-3">
                     <a href="{{ route('produtos.procurar') }}" class="btn-yellow w-full inline-block">
                         <i class="fas fa-search mr-2"></i>Buscar Produtos
@@ -377,44 +377,44 @@
 document.addEventListener('DOMContentLoaded', function() {
     const valorDinheiroInput = document.getElementById('valor_dinheiro');
     const paymentFields = document.querySelectorAll('.payment-field');
-    
+
     // Função para aplicar máscara monetária
     function aplicarMascaraMonetaria(valor) {
         // Remove tudo que não é dígito
         valor = valor.replace(/\D/g, '');
-        
+
         // Converte para centavos
         valor = (valor / 100).toFixed(2) + '';
-        
+
         // Aplica a formatação brasileira
         valor = valor.replace(".", ",");
         valor = valor.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1.");
-        
+
         return valor;
     }
-    
+
     // Função para aplicar máscara monetária simples (sem R$)
     function aplicarMascaraSimples(valor) {
         // Remove tudo que não é dígito
         valor = valor.replace(/\D/g, '');
-        
+
         // Se vazio, retorna 0,00
         if (valor === '') return '0,00';
-        
+
         // Converte para centavos
         valor = (valor / 100).toFixed(2) + '';
-        
+
         // Aplica a formatação brasileira
         valor = valor.replace(".", ",");
-        
+
         return valor;
     }
-    
+
     // Função para remover máscara e obter valor numérico
     function removerMascara(valor) {
         return valor.replace(/[^\d,]/g, '').replace(',', '.');
     }
-    
+
     // Configura máscara para o campo de dinheiro recebido
     if (valorDinheiroInput) {
         valorDinheiroInput.addEventListener('input', function(e) {
@@ -422,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
             valor = valor.replace(/[^\d]/g, '');
             e.target.value = 'R$ ' + aplicarMascaraMonetaria(valor);
         });
-        
+
         // Aplica máscara ao campo se já tiver valor
         if (valorDinheiroInput.value && valorDinheiroInput.value !== '') {
             let valorAtual = valorDinheiroInput.value.replace(/[^\d,]/g, '');
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    
+
     // Configura máscara para os campos de pagamento
     paymentFields.forEach(function(field) {
         field.addEventListener('input', function(e) {
@@ -440,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let valor = e.target.value;
                 valor = valor.replace(/[^\d]/g, '');
                 e.target.value = aplicarMascaraSimples(valor);
-                
+
                 // Atualiza o campo hidden correspondente
                 const hiddenField = document.getElementById(e.target.id + '_manual');
                 if (hiddenField) {
@@ -449,10 +449,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Inicializa o modo baseado na seleção atual
     toggleManualMode();
-    
+
     // Remove máscara antes de enviar o formulário
     const form = document.querySelector('form[action*="aplicarDesconto"]');
     if (form) {
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 valor = valor.replace('R$ ', '').replace(/\./g, '');
                 valorDinheiroInput.value = valor;
             }
-            
+
             // Atualiza campos hidden com valores dos campos visíveis
             paymentFields.forEach(function(field) {
                 const hiddenField = document.getElementById(field.id + '_manual');
@@ -476,30 +476,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function toggleManualMode() {
     console.log('toggleManualMode chamada');
-    
+
     const tipoDesconto = document.getElementById('tipo_desconto');
     if (!tipoDesconto) {
         console.error('Elemento tipo_desconto não encontrado');
         return;
     }
-    
+
     const tipoDescontoValue = tipoDesconto.value;
     const paymentFields = document.querySelectorAll('.payment-field');
     const isManual = tipoDescontoValue === 'manual';
-    
+
     console.log('Tipo desconto:', tipoDescontoValue);
     console.log('É manual:', isManual);
     console.log('Campos encontrados:', paymentFields.length);
-    
+
     paymentFields.forEach(function(field) {
         console.log('Processando campo:', field.id);
-        
+
         if (isManual) {
             field.readOnly = false;
             field.classList.remove('bg-gray-100');
             field.classList.add('bg-white');
             field.style.cursor = 'text';
-            
+
             // Se estiver mudando para manual e o campo estiver zerado, limpa para facilitar a digitação
             if (field.value === '0,00') {
                 field.value = '';
@@ -513,7 +513,7 @@ function toggleManualMode() {
             console.log('Campo desabilitado:', field.id);
         }
     });
-    
+
     // Se não for manual, zera os campos hidden
     if (!isManual) {
         document.querySelectorAll('input[name$="_manual"]').forEach(function(hiddenField) {
@@ -526,29 +526,29 @@ function toggleManualMode() {
 // SweetAlert2 para confirmação de finalização de compra
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Inicializando botão de finalizar compra...');
-    
+
     const finalizeButton = document.getElementById('finalize-button');
     const finalizeForm = document.getElementById('finalize-form');
-    
+
     console.log('Botão encontrado:', !!finalizeButton);
     console.log('Formulário encontrado:', !!finalizeForm);
-    
+
     if (finalizeButton && finalizeForm) {
         finalizeButton.addEventListener('click', function(e) {
             e.preventDefault();
             console.log('Botão de finalizar clicado');
-            
+
             // Calcular informações da compra para exibir no SweetAlert
             const totalElement = document.querySelector('.text-2xl.font-bold.text-red-600');
             const totalValue = totalElement ? totalElement.textContent.trim() : 'R$ 0,00';
-            
+
             // Contar itens no carrinho
             const cartItems = document.querySelectorAll('.table-row').length;
-            
+
             console.log('Total de itens:', cartItems);
             console.log('Valor total:', totalValue);
             console.log('JJAlert disponível:', typeof JJAlert !== 'undefined');
-            
+
             // Verifica se JJAlert está disponível
             if (typeof JJAlert !== 'undefined' && JJAlert.finalizarCompra) {
                 console.log('Usando JJAlert.finalizarCompra');

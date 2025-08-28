@@ -104,8 +104,8 @@ const swalConfigs = {
         reverseButtons: true,
         customClass: {
             ...defaultSwalConfig.customClass,
-            confirmButton: 'swal2-confirm-success',
-            cancelButton: 'swal2-cancel-error'
+            confirmButton: 'btn-green w-full sm:w-auto',
+            cancelButton: 'btn-red w-full sm:w-auto'
         }
     }
 };
@@ -213,12 +213,16 @@ window.JJAlert.finalizarCompra = (totalItens, valorTotal) => {
         `,
         icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#16a34a',
-        cancelButtonColor: '#dc2626',
         confirmButtonText: '<i class="fas fa-check mr-2"></i>Sim, finalizar!',
         cancelButtonText: '<i class="fas fa-times mr-2"></i>Cancelar',
         reverseButtons: true,
-        ...defaultSwalConfig
+        customClass: {
+            popup: 'swal2-popup-jj',
+            title: 'swal2-title-jj',
+            confirmButton: 'swal2-confirm-success',
+            cancelButton: 'swal2-cancel-error'
+        },
+        buttonsStyling: false
     });
 };
 
