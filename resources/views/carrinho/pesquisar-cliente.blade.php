@@ -63,10 +63,17 @@
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex-shrink-0 h-16 w-16">
-                                            @if($cliente->foto && file_exists(public_path('storage/uploads/clientes/' . $cliente->foto)))
-                                                <img class="h-16 w-16 rounded-full object-cover border-2 border-gray-200" 
-                                                     src="{{ asset('storage/uploads/clientes/' . $cliente->foto) }}" 
-                                                     alt="Foto de {{ $cliente->nome }}">
+                                            @if($cliente->foto)
+                                                @php $pasta = $cliente->pasta ?? $cliente->cpf; @endphp
+                                                @if(file_exists(public_path('storage/uploads/clientes/' . $pasta . '/' . $cliente->foto)))
+                                                    <img class="h-16 w-16 rounded-full object-cover border-2 border-gray-200" 
+                                                         src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $cliente->foto) }}" 
+                                                         alt="Foto de {{ $cliente->nome }}">
+                                                @else
+                                                    <div class="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center border-2 border-gray-200">
+                                                        <i class="fas fa-user text-gray-500 text-xl"></i>
+                                                    </div>
+                                                @endif
                                             @else
                                                 <div class="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center border-2 border-gray-200">
                                                     <i class="fas fa-user text-gray-500 text-xl"></i>
