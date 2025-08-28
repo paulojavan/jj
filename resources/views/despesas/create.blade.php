@@ -25,6 +25,10 @@
                 <option value="Cheque">Cheque</option>
             </select>
         </div>
+        <div id="metodo-pagamento-container" class="mb-4" style="display: none;">
+            <label for="metodo_pagamento" class="block text-sm font-medium text-gray-700">Método de Pagamento</label>
+            <input type="text" name="metodo_pagamento" id="metodo_pagamento" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" placeholder="Digite o método de pagamento">
+        </div>
         <div class="mb-4">
             <label for="empresa" class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
             <input type="text" name="empresa" id="empresa" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
@@ -50,6 +54,20 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// Função para mostrar/ocultar campo de método de pagamento
+document.getElementById('tipo').addEventListener('change', function() {
+    const metodoPagamentoContainer = document.getElementById('metodo-pagamento-container');
+    const metodoPagamentoInput = document.getElementById('metodo_pagamento');
+    
+    if (this.value === 'Despeza') {
+        metodoPagamentoContainer.style.display = 'block';
+        metodoPagamentoInput.required = true;
+    } else {
+        metodoPagamentoContainer.style.display = 'none';
+        metodoPagamentoInput.required = false;
+        metodoPagamentoInput.value = '';
+    }
+});
 // Função para aplicar máscara monetária
 function aplicarMascaraMonetaria(input) {
     // Remove qualquer formatação existente

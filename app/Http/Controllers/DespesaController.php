@@ -225,19 +225,26 @@ class DespesaController extends Controller
             'datas' => 'required|array',
             'valores' => 'required|array',
             'cidade_id' => 'sometimes|required|exists:cidades,id',
+            'metodo_pagamento' => 'nullable|string|max:255',
         ]);
 
-        // Limpar os valores monetários usando a lógica sugerida
+        // Limpar os valores monetários
         $valoresLimpos = [];
         foreach ($validated['valores'] as $valor) {
-            // Remover tudo que não for dígito
-            $valorNumerico = preg_replace('/\D/', '', $valor);
+            // Normalizar o valor para formato decimal
+            if (is_string($valor)) {
+                // Se contém vírgula, é formato brasileiro (ex: 100,00)
+                if (strpos($valor, ',') !== false) {
+                    // Remove pontos (separadores de milhares) e substitui vírgula por ponto
+                    $valor = str_replace('.', '', $valor);
+                    $valor = str_replace(',', '.', $valor);
+                }
+                // Remove qualquer caractere que não seja dígito, ponto ou sinal negativo
+                $valor = preg_replace('/[^0-9.-]/', '', $valor);
+            }
             
-            // Converter para float dividindo por 100 (considerando centavos)
-            $valorFloat = (float) $valorNumerico / 100;
-            
-            // Garantir que o valor é válido
-            $valoresLimpos[] = is_numeric($valorFloat) ? $valorFloat : 0.0;
+            $valorFloat = (float) $valor;
+            $valoresLimpos[] = $valorFloat;
         }
 
         $user = Auth::user();
@@ -249,6 +256,10 @@ class DespesaController extends Controller
         $quantidade = $validated['quantidade'];
         $numeroDocumento = $validated['numero_documento'];
 
+        // Definir status e pagamento baseado no tipo
+        $status = ($validated['tipo'] === 'Despeza') ? 'Pago' : 'pendente';
+        $pagamento = ($validated['tipo'] === 'Despeza') ? $validated['metodo_pagamento'] : null;
+
         for ($i = 1; $i <= $quantidade; $i++) {
             $numero = $numeroDocumento . "($i de $quantidade)";
             $model::create([
@@ -257,8 +268,8 @@ class DespesaController extends Controller
                 'empresa' => $validated['empresa'],
                 'numero' => $numero,
                 'valor' => $valoresLimpos[$i-1],
-                'status' => 'pendente',
-                'pagamento' => null,
+                'status' => $status,
+                'pagamento' => $pagamento,
             ]);
         }
 
@@ -277,8 +288,21 @@ class DespesaController extends Controller
         ]);
 
         // Limpar o valor monetário
-        $valorNumerico = preg_replace('/\D/', '', $validated['valor']);
-        $valorFloat = (float) $valorNumerico / 100;
+        $valor = $validated['valor'];
+        
+        // Normalizar o valor para formato decimal
+        if (is_string($valor)) {
+            // Se contém vírgula, é formato brasileiro (ex: 100,00)
+            if (strpos($valor, ',') !== false) {
+                // Remove pontos (separadores de milhares) e substitui vírgula por ponto
+                $valor = str_replace('.', '', $valor);
+                $valor = str_replace(',', '.', $valor);
+            }
+            // Remove qualquer caractere que não seja dígito, ponto ou sinal negativo
+            $valor = preg_replace('/[^0-9.-]/', '', $valor);
+        }
+        
+        $valorFloat = (float) $valor;
 
         $user = Auth::user();
         $cidade_id = $request->input('cidade_id', $user->cidade);
@@ -312,8 +336,21 @@ class DespesaController extends Controller
         ]);
 
         // Limpar o valor monetário
-        $valorNumerico = preg_replace('/\D/', '', $validated['valor']);
-        $valorFloat = (float) $valorNumerico / 100;
+        $valor = $validated['valor'];
+        
+        // Normalizar o valor para formato decimal
+        if (is_string($valor)) {
+            // Se contém vírgula, é formato brasileiro (ex: 100,00)
+            if (strpos($valor, ',') !== false) {
+                // Remove pontos (separadores de milhares) e substitui vírgula por ponto
+                $valor = str_replace('.', '', $valor);
+                $valor = str_replace(',', '.', $valor);
+            }
+            // Remove qualquer caractere que não seja dígito, ponto ou sinal negativo
+            $valor = preg_replace('/[^0-9.-]/', '', $valor);
+        }
+        
+        $valorFloat = (float) $valor;
 
         $cidade_id = $validated['cidade_id'];
         $cidade = strtolower(DB::table('cidades')->where('id', $cidade_id)->value('cidade'));
@@ -415,8 +452,21 @@ class DespesaController extends Controller
         $model = ($cidade === 'tabira') ? DespesaTabira::class : DespesaPrincesa::class;
         
         // Limpar o valor monetário
-        $valorNumerico = preg_replace('/\D/', '', $validated['valor']);
-        $valorFloat = (float) $valorNumerico / 100;
+        $valor = $validated['valor'];
+        
+        // Normalizar o valor para formato decimal
+        if (is_string($valor)) {
+            // Se contém vírgula, é formato brasileiro (ex: 100,00)
+            if (strpos($valor, ',') !== false) {
+                // Remove pontos (separadores de milhares) e substitui vírgula por ponto
+                $valor = str_replace('.', '', $valor);
+                $valor = str_replace(',', '.', $valor);
+            }
+            // Remove qualquer caractere que não seja dígito, ponto ou sinal negativo
+            $valor = preg_replace('/[^0-9.-]/', '', $valor);
+        }
+        
+        $valorFloat = (float) $valor;
         
         // Atualizar a despesa
         $despesa = $model::findOrFail($validated['id_despesa']);
