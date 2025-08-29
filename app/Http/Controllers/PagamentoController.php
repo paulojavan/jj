@@ -92,15 +92,15 @@ class PagamentoController extends Controller
 
         // Verificar se os valores estão corretos
         $totalPago = $dinheiro + $pix + $cartao;
-        
+
         // Obter as parcelas selecionadas
         $parcelasIds = $request->input('parcelas');
         $parcelas = Parcela::whereIn('id_parcelas', $parcelasIds)->get();
-        
+
         // Obter configuração de multa
         $multaConfig = MultaConfiguracao::first();
         $today = Carbon::today();
-        
+
         // Função para calcular valor a pagar
         $calcularValorAPagar = function (Parcela $parcela) use ($multaConfig, $today) {
             $dataVencimento = Carbon::parse($parcela->data_vencimento);
@@ -119,7 +119,7 @@ class PagamentoController extends Controller
 
             return round($valorAPagar, 2);
         };
-        
+
         // Calcular o total das parcelas selecionadas
         $totalParcelas = 0;
         $valoresParcelas = []; // Array para armazenar os valores calculados
@@ -128,7 +128,7 @@ class PagamentoController extends Controller
             $valoresParcelas[$parcela->id_parcelas] = $valorAPagar;
             $totalParcelas += $valorAPagar;
         }
-        
+
         // Verificar se o total pago corresponde ao total das parcelas
         $diferenca = abs($totalPago - $totalParcelas);
         if ($diferenca > 0.01) {
@@ -143,15 +143,15 @@ class PagamentoController extends Controller
                 'parcelasIds' => $parcelasIds,
                 'quantidadeParcelas' => count($parcelas)
             ];
-            
+
             \Log::info('Erro de valores no pagamento', $debugInfo);
-            
+
             return redirect()->back()->with('error', 'Valores não correspondem ao total das parcelas selecionadas. Total das parcelas com juros/multa: R$ ' . number_format($totalParcelas, 2, ',', '.') . ' | Total informado: R$ ' . number_format($totalPago, 2, ',', '.') . ' | Diferença: R$ ' . number_format($diferenca, 2, ',', '.'));
         }
 
         // Gerar token único
         $ticket = Str::uuid()->toString();
-        
+
         // Obter data e hora atuais
         $dataHora = Carbon::now();
         $data = $dataHora; // Agora passamos o objeto Carbon completo com data e hora
@@ -178,7 +178,7 @@ class PagamentoController extends Controller
         foreach ($parcelas as $parcela) {
             // Obter o valor calculado para esta parcela
             $valorParcela = $valoresParcelas[$parcela->id_parcelas];
-            
+
             // Para uma parcela única, os valores são exatamente os informados
             if (count($parcelas) == 1) {
                 $dinheiroParcela = $dinheiro;
@@ -187,7 +187,7 @@ class PagamentoController extends Controller
             } else {
                 // Calcular proporção desta parcela em relação ao total
                 $proporcao = $totalParcelas > 0 ? $valorParcela / $totalParcelas : 0;
-                
+
                 // Calcular valores de cada método de pagamento para esta parcela
                 $dinheiroParcela = round($dinheiro * $proporcao, 2);
                 $pixParcela = round($pix * $proporcao, 2);
@@ -223,14 +223,14 @@ class PagamentoController extends Controller
     private function parseCurrency($value)
     {
         if (!$value || $value === '') return 0;
-        
+
         // Remove espaços em branco
         $value = trim($value);
-        
+
         // Remove pontos e substitui vírgula por ponto
         $value = str_replace('.', '', $value);
         $value = str_replace(',', '.', $value);
-        
+
         return floatval($value);
     }
 }

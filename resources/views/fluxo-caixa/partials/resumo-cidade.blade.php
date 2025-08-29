@@ -6,13 +6,13 @@
                 <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
                 {{ $cidadeData['cidade']['nome'] }}
             </h2>
-            <button type="button" 
+            <button type="button"
                     class="toggle-vendedor text-gray-500 hover:text-gray-700 transition-colors"
                     data-target="cidade-{{ $loop->index }}">
                 <i class="fas fa-chevron-down"></i>
             </button>
         </div>
-        
+
         <!-- Resumo da Cidade -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             <div class="text-center">
@@ -24,7 +24,7 @@
             <div class="text-center">
                 <div class="text-sm text-gray-600">Recebimentos</div>
                 <div class="text-lg font-bold text-green-600">
-                    R$ {{ number_format($cidadeData['resumo_cidade']['recebimentos']['total_geral'], 2, ',', '.') }}
+                    R$ {{ number_format($cidadeData['resumo_cidade']['recebimentos']['total_dinheiro_completo'], 2, ',', '.') }}
                 </div>
             </div>
             <div class="text-center">
@@ -54,13 +54,13 @@
                                 <i class="fas fa-user mr-2 text-green-600"></i>
                                 {{ $vendedorData['vendedor']->name }}
                             </h3>
-                            <button type="button" 
+                            <button type="button"
                                     class="toggle-vendedor text-gray-400 hover:text-gray-600 transition-colors"
                                     data-target="vendedor-{{ $loop->parent->index }}-{{ $loop->index }}">
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                         </div>
-                        
+
                         <!-- Resumo do Vendedor -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
                             <div>

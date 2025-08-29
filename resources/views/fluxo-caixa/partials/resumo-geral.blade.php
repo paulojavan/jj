@@ -2,7 +2,7 @@
     <h2 class="text-xl font-bold mb-4">
         <i class="fas fa-chart-line mr-2"></i>Resumo Geral - Todas as Cidades
     </h2>
-    
+
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Vendas -->
         <div class="bg-cyan-500 rounded-lg p-4">
@@ -53,7 +53,7 @@
                 </div>
                 <div class="flex justify-between border-t border-white border-opacity-30 pt-1 mt-2">
                     <span class="font-semibold text-white">Total:</span>
-                    <span class="font-bold text-green-200">R$ {{ number_format($resumo['recebimentos']['total_geral'], 2, ',', '.') }}</span>
+                    <span class="font-bold text-green-200">R$ {{ number_format($resumo['recebimentos']['total_dinheiro_completo'], 2, ',', '.') }}</span>
                 </div>
             </div>
         </div>
@@ -85,7 +85,7 @@
                 </div>
                 <div class="flex justify-between">
                     <span>Total Recebido:</span>
-                    <span class="font-medium text-white">R$ {{ number_format($resumo['recebimentos']['total_geral'], 2, ',', '.') }}</span>
+                    <span class="font-medium text-white">R$ {{ number_format($resumo['recebimentos']['total_dinheiro_completo'], 2, ',', '.') }}</span>
                 </div>
             </div>
         </div>

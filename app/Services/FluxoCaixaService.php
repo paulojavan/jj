@@ -19,16 +19,16 @@ class FluxoCaixaService
         // Cache para consultas frequentes (apenas para períodos pequenos)
         $cacheKey = "fluxo_geral_{$usuario->id}_{$dataInicio}_{$dataFim}";
         $cacheMinutos = config('fluxo-caixa.cache_consultas_minutos', 5);
-        
+
         // Só usar cache para consultas do dia atual ou períodos pequenos
         $usarCache = $this->deveUsarCache($dataInicio, $dataFim);
-        
+
         if ($usarCache) {
             return Cache::remember($cacheKey, $cacheMinutos, function() use ($dataInicio, $dataFim, $usuario) {
                 return $this->processarFluxoGeral($dataInicio, $dataFim, $usuario);
             });
         }
-        
+
         return $this->processarFluxoGeral($dataInicio, $dataFim, $usuario);
     }
 
@@ -42,7 +42,7 @@ class FluxoCaixaService
 
         foreach ($cidades as $cidade) {
             $dadosCidade = $this->processarDadosCidade($cidade, $dataInicio, $dataFim, $usuario);
-            
+
             if (!empty($dadosCidade['vendedores'])) {
                 $dadosFluxo[] = $dadosCidade;
             }
@@ -62,7 +62,7 @@ class FluxoCaixaService
         $inicio = \Carbon\Carbon::parse($dataInicio);
         $fim = \Carbon\Carbon::parse($dataFim);
         $diasDiferenca = $inicio->diffInDays($fim);
-        
+
         // Usar cache apenas para períodos de até 7 dias
         return $diasDiferenca <= 7;
     }
@@ -83,7 +83,7 @@ class FluxoCaixaService
         }
 
         $cidade = $this->obterNomeCidade($vendedor->cidade);
-        
+
         $vendas = $this->obterVendasIndividuais($cidade, $vendedorId, $dataInicio, $dataFim);
 
         return [
@@ -100,12 +100,12 @@ class FluxoCaixaService
      */
     private function processarDadosCidade($cidade, $dataInicio, $dataFim, $usuario)
     {
-        $vendedores = $this->obterVendedoresCidade($cidade['id'], $usuario);
+        $vendedores = $this->obterVendedoresCidade($cidade['id'], $usuario, $cidade['nome'], $dataInicio, $dataFim);
         $dadosVendedores = [];
 
         foreach ($vendedores as $vendedor) {
             $vendas = $this->obterVendasVendedor($cidade['nome'], $vendedor->id, $dataInicio, $dataFim);
-            $recebimentos = $this->obterRecebimentosVendedor($vendedor->id, $dataInicio, $dataFim);
+            $recebimentos = $this->obterRecebimentosVendedor($cidade['nome'], $vendedor->id, $dataInicio, $dataFim);
 
             // Só inclui vendedor se teve vendas ou recebimentos no período
             if (!empty($vendas) || !empty($recebimentos)) {
@@ -152,18 +152,46 @@ class FluxoCaixaService
     }
 
     /**
-     * Obtém vendedores de uma cidade específica
+     * Obtém vendedores de uma cidade específica que tenham dados no período
      */
-    private function obterVendedoresCidade($cidadeId, $usuario)
+    private function obterVendedoresCidade($cidadeId, $usuario, $nomeCidade, $dataInicio, $dataFim)
     {
-        $query = User::where('cidade', $cidadeId)->where('status', 'ativo');
-
         // Se não for administrador, mostra apenas o próprio usuário
         if ($usuario->nivel !== 'administrador') {
-            $query->where('id', $usuario->id);
+            return User::where('id', $usuario->id)->get();
         }
 
-        return $query->get();
+        // Para administradores, buscar vendedores que tenham vendas ou recebimentos na cidade no período
+        $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
+        
+        // Buscar IDs de vendedores que fizeram vendas
+        $vendedoresComVendas = [];
+        if ($this->tabelaExiste($tabelaVendas)) {
+            $vendedoresComVendas = DB::table($tabelaVendas)
+                ->whereBetween('data_venda', [$dataInicio, $dataFim])
+                ->whereRaw('(data_estorno IS NULL OR data_venda != data_estorno)')
+                ->distinct()
+                ->pluck('id_vendedor')
+                ->toArray();
+        }
+        
+        // Buscar IDs de vendedores que receberam parcelas
+        $vendedoresComRecebimentos = Parcela::where('bd', $tabelaVendas)
+            ->whereBetween('data_pagamento', [$dataInicio, $dataFim])
+            ->whereNotNull('data_pagamento')
+            ->distinct()
+            ->pluck('id_vendedor')
+            ->toArray();
+        
+        // Combinar ambos os arrays
+        $vendedoresIds = array_unique(array_merge($vendedoresComVendas, $vendedoresComRecebimentos));
+        
+        if (empty($vendedoresIds)) {
+            return collect([]);
+        }
+        
+        // Retornar usuários que têm dados, independente de status ou cidade
+        return User::whereIn('id', $vendedoresIds)->get();
     }
 
     /**
@@ -172,7 +200,7 @@ class FluxoCaixaService
     private function obterVendasVendedor($nomeCidade, $vendedorId, $dataInicio, $dataFim)
     {
         $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
-        
+
         if (!$this->tabelaExiste($tabelaVendas)) {
             Log::warning("Tabela de vendas não encontrada: {$tabelaVendas}");
             return [];
@@ -196,7 +224,7 @@ class FluxoCaixaService
     private function obterVendasIndividuais($nomeCidade, $vendedorId, $dataInicio, $dataFim)
     {
         $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
-        
+
         if (!$this->tabelaExiste($tabelaVendas)) {
             Log::warning("Tabela de vendas não encontrada: {$tabelaVendas}");
             return [];
@@ -215,10 +243,13 @@ class FluxoCaixaService
     /**
      * Obtém recebimentos de parcelas de um vendedor
      */
-    private function obterRecebimentosVendedor($vendedorId, $dataInicio, $dataFim)
+    private function obterRecebimentosVendedor($nomeCidade, $vendedorId, $dataInicio, $dataFim)
     {
-        return $this->executarConsultaSegura(function() use ($vendedorId, $dataInicio, $dataFim) {
+        $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
+        
+        return $this->executarConsultaSegura(function() use ($tabelaVendas, $vendedorId, $dataInicio, $dataFim) {
             return Parcela::where('id_vendedor', $vendedorId)
+                ->where('bd', $tabelaVendas)
                 ->whereBetween('data_pagamento', [$dataInicio, $dataFim])
                 ->whereNotNull('data_pagamento')
                 ->orderBy('metodo')
@@ -226,7 +257,7 @@ class FluxoCaixaService
                 ->orderBy('hora')
                 ->get()
                 ->toArray();
-        }, "Consulta recebimentos vendedor {$vendedorId}");
+        }, "Consulta recebimentos vendedor {$vendedorId} em {$nomeCidade}");
     }
 
     /**
@@ -235,7 +266,7 @@ class FluxoCaixaService
     private function obterDespesas($nomeCidade, $dataInicio, $dataFim)
     {
         $tabelaDespesas = TabelaDinamica::despesas($nomeCidade);
-        
+
         if (!$this->tabelaExiste($tabelaDespesas)) {
             Log::warning("Tabela de despesas não encontrada: {$tabelaDespesas}");
             return [];
@@ -269,25 +300,25 @@ class FluxoCaixaService
             // Tratar tanto objetos quanto arrays
             $dataEstorno = is_object($venda) ? ($venda->data_estorno ?? null) : ($venda['data_estorno'] ?? null);
             $multiplicador = ($dataEstorno) ? -1 : 1;
-            
+
             $valorDinheiro = is_object($venda) ? ($venda->valor_dinheiro ?? 0) : ($venda['valor_dinheiro'] ?? 0);
             $valorPix = is_object($venda) ? ($venda->valor_pix ?? 0) : ($venda['valor_pix'] ?? 0);
             $valorCartao = is_object($venda) ? ($venda->valor_cartao ?? 0) : ($venda['valor_cartao'] ?? 0);
             $valorCrediario = is_object($venda) ? ($venda->valor_crediario ?? 0) : ($venda['valor_crediario'] ?? 0);
-            
+
             $resumo['total_dinheiro'] += $valorDinheiro * $multiplicador;
             $resumo['total_pix'] += $valorPix * $multiplicador;
             $resumo['total_cartao'] += $valorCartao * $multiplicador;
             $resumo['total_crediario'] += $valorCrediario * $multiplicador;
-            
+
             $resumo['quantidade_vendas']++;
-            
+
             if ($multiplicador === -1) {
                 $resumo['vendas_estornadas']++;
             }
         }
 
-        $resumo['total_geral'] = $resumo['total_dinheiro'] + $resumo['total_pix'] + 
+        $resumo['total_geral'] = $resumo['total_dinheiro'] + $resumo['total_pix'] +
                                 $resumo['total_cartao'] + $resumo['total_crediario'];
 
         return $resumo;
@@ -311,7 +342,7 @@ class FluxoCaixaService
             $dinheiro = is_object($recebimento) ? ($recebimento->dinheiro ?? 0) : ($recebimento['dinheiro'] ?? 0);
             $pix = is_object($recebimento) ? ($recebimento->pix ?? 0) : ($recebimento['pix'] ?? 0);
             $cartao = is_object($recebimento) ? ($recebimento->cartao ?? 0) : ($recebimento['cartao'] ?? 0);
-            
+
             $resumo['total_dinheiro'] += $dinheiro;
             $resumo['total_pix'] += $pix;
             $resumo['total_cartao'] += $cartao;
@@ -371,9 +402,13 @@ class FluxoCaixaService
             $resumo['despesas']['total'] += $valor;
         }
 
-        // Calcula valor líquido em dinheiro (recebimentos - despesas)
-        $resumo['recebimentos']['total_dinheiro_liquido'] = 
-            $resumo['recebimentos']['total_dinheiro'] - $resumo['despesas']['total'];
+        // Calcula total de dinheiro (vendas à vista + recebimentos de parcelas)
+        $resumo['recebimentos']['total_dinheiro_completo'] =
+            $resumo['vendas']['total_dinheiro'] + $resumo['recebimentos']['total_dinheiro'];
+
+        // Calcula valor líquido em dinheiro (total dinheiro - despesas)
+        $resumo['recebimentos']['total_dinheiro_liquido'] =
+            $resumo['recebimentos']['total_dinheiro_completo'] - $resumo['despesas']['total'];
 
         return $resumo;
     }
@@ -420,8 +455,13 @@ class FluxoCaixaService
 
         $resumoGeral['vendas']['total_geral'] = array_sum($resumoGeral['vendas']);
         $resumoGeral['recebimentos']['total_geral'] = array_sum($resumoGeral['recebimentos']);
-        $resumoGeral['recebimentos']['total_dinheiro_liquido'] = 
-            $resumoGeral['recebimentos']['total_dinheiro'] - $resumoGeral['despesas']['total'];
+        
+        // Calcula total de dinheiro (vendas à vista + recebimentos de parcelas)
+        $resumoGeral['recebimentos']['total_dinheiro_completo'] =
+            $resumoGeral['vendas']['total_dinheiro'] + $resumoGeral['recebimentos']['total_dinheiro'];
+        
+        $resumoGeral['recebimentos']['total_dinheiro_liquido'] =
+            $resumoGeral['recebimentos']['total_dinheiro_completo'] - $resumoGeral['despesas']['total'];
 
         return $resumoGeral;
     }
@@ -496,12 +536,12 @@ class FluxoCaixaService
                 'erro' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             // Re-throw com mensagem mais amigável se necessário
             if (str_contains($e->getMessage(), "doesn't exist")) {
                 throw new \Exception("Tabela de dados não encontrada. Verifique a configuração da cidade.");
             }
-            
+
             throw $e;
         }
     }
@@ -518,11 +558,11 @@ class FluxoCaixaService
             // Limpar todo cache do fluxo de caixa
             $pattern = "fluxo_*";
         }
-        
+
         // Laravel não tem um método nativo para limpar por pattern
         // Em produção, considere usar Redis com SCAN
         Cache::flush(); // Por simplicidade, limpa todo o cache
-        
+
         Log::info('Cache do fluxo de caixa limpo', ['usuario' => $usuarioId]);
     }
 
@@ -532,11 +572,11 @@ class FluxoCaixaService
     public function obterEstatisticasPerformance($dataInicio, $dataFim, $usuario)
     {
         $inicio = microtime(true);
-        
+
         $dados = $this->obterDadosFluxoGeral($dataInicio, $dataFim, $usuario);
-        
+
         $tempoExecucao = microtime(true) - $inicio;
-        
+
         $estatisticas = [
             'tempo_execucao_segundos' => round($tempoExecucao, 3),
             'total_cidades' => count($dados['cidades'] ?? []),
@@ -544,16 +584,16 @@ class FluxoCaixaService
             'total_vendas' => 0,
             'total_recebimentos' => 0,
         ];
-        
+
         foreach ($dados['cidades'] ?? [] as $cidade) {
             $estatisticas['total_vendedores'] += count($cidade['vendedores'] ?? []);
-            
+
             foreach ($cidade['vendedores'] ?? [] as $vendedor) {
                 $estatisticas['total_vendas'] += count($vendedor['vendas'] ?? []);
                 $estatisticas['total_recebimentos'] += count($vendedor['recebimentos'] ?? []);
             }
         }
-        
+
         return $estatisticas;
     }
 }

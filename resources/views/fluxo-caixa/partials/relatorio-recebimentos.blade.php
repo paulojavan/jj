@@ -2,7 +2,7 @@
     <h4 class="font-semibold text-green-800 mb-3 flex items-center">
         <i class="fas fa-hand-holding-usd mr-2"></i>Recebimentos de Parcelas
     </h4>
-    
+
     @if(count($recebimentos) > 0)
         <!-- Resumo dos Recebimentos -->
         <div class="bg-white rounded p-3 mb-4 border border-green-200">
@@ -36,7 +36,7 @@
             @php
                 $recebimentosAgrupados = collect($recebimentos)->groupBy('metodo');
             @endphp
-            
+
             @foreach($recebimentosAgrupados as $metodo => $recebimentosMetodo)
                 <div class="mb-4">
                     <h5 class="text-sm font-semibold text-gray-700 mb-2 flex items-center">
@@ -58,7 +58,7 @@
                                 <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs">{{ strtoupper($metodo) }}</span>
                         @endswitch
                     </h5>
-                    
+
                     @foreach($recebimentosMetodo as $recebimento)
                         <div class="bg-white rounded p-3 border border-gray-200 ml-4">
                             <div class="flex justify-between items-start">
@@ -71,7 +71,7 @@
                                             <span class="text-xs text-gray-500">{{ $recebimento['hora'] }}</span>
                                         @endif
                                     </div>
-                                    
+
                                     <!-- Valores por método -->
                                     <div class="grid grid-cols-3 gap-2 mt-2 text-xs">
                                         @if($recebimento['dinheiro'] > 0)
@@ -93,14 +93,14 @@
                                             </div>
                                         @endif
                                     </div>
-                                    
+
                                     @if(isset($recebimento['valor_parcela']))
                                         <div class="text-xs text-gray-500 mt-1">
                                             Parcela: R$ {{ number_format($recebimento['valor_parcela'], 2, ',', '.') }}
                                         </div>
                                     @endif
                                 </div>
-                                
+
                                 <div class="text-right">
                                     @php
                                         $totalRecebimento = $recebimento['dinheiro'] + $recebimento['pix'] + $recebimento['cartao'];
