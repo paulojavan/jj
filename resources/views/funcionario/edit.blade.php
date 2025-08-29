@@ -1,112 +1,159 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="content-title">
-            <h1 class="page-title">Editar Funcionário</h1>
-            <a href=" {{ route('funcionario.index') }} " class="btn-yellow">Listar</a>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Editar Funcionário" 
+        subtitle="Atualize as informações do funcionário: {{ $funcionario->name }}" 
+        icon="fas fa-user-edit">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-list" href="{{ route('funcionario.index') }}">
+                Listar Funcionários
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('funcionario.update', ['id' => $funcionario->id]) }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-4">
-        <label class="form-label" for="name" >Nome:</label>
-        <input class="form-input" type="text" name="name" id="name" placeholder="Nome do vendedor" value="{{ old('name', $funcionario->name) }}" required>
+    <x-form 
+        title="Dados do Funcionário" 
+        subtitle="Atualize as informações do funcionário" 
+        action="{{ route('funcionario.update', ['id' => $funcionario->id]) }}" 
+        method="PUT"
+        enctype="multipart/form-data"
+    >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <x-input 
+                label="Nome" 
+                name="name" 
+                type="text" 
+                placeholder="Nome do funcionário" 
+                :value="$funcionario->name" 
+                icon="fas fa-user" 
+                required="true" 
+            />
+            
+            <x-input 
+                label="Login" 
+                name="login" 
+                type="text" 
+                placeholder="Login do usuário" 
+                :value="$funcionario->login" 
+                icon="fas fa-sign-in-alt" 
+                required="true" 
+            />
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <x-input 
+                label="Nova Senha" 
+                name="password" 
+                type="password" 
+                placeholder="Deixe em branco para manter a atual" 
+                icon="fas fa-lock" 
+                help="Deixe em branco se não quiser alterar a senha"
+            />
+            
+            <x-input 
+                label="Cidade" 
+                name="cidade" 
+                type="select" 
+                :options="$cidades->pluck('cidade', 'id')"
+                :value="$funcionario->cidade" 
+                icon="fas fa-map-marker-alt" 
+                required="true" 
+            />
+            
+            <x-input 
+                label="Status" 
+                name="status" 
+                type="select" 
+                :options="['ativo' => 'Ativo', 'inativo' => 'Inativo']"
+                :value="$funcionario->status" 
+                icon="fas fa-toggle-on" 
+                required="true" 
+            />
         </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="login">Login:</label>
-        <input class="form-input" type="text" name="login" id="login" placeholder="login do usuário" value="{{ old('login', $funcionario->login) }}" required>
+        <div class="mb-6">
+            <x-input 
+                label="Foto do Funcionário" 
+                name="image" 
+                type="file" 
+                accept="image/*" 
+                icon="fas fa-camera" 
+                help="Selecione uma nova foto ou deixe em branco para manter a atual"
+            />
+            
+            @if($funcionario->image)
+                <div class="mt-3">
+                    <img class="h-32 w-32 object-cover rounded-lg border" 
+                         src="{{ asset('storage/uploads/funcionarios/' . $funcionario->image) }}" 
+                         alt="{{ $funcionario->name }}">
+                    <p class="text-sm text-gray-600 mt-1">Foto atual</p>
+                </div>
+            @endif
         </div>
 
-        <div class="mb-4">
-            <div class="mb-4">
-                <label class="form-label" for="password">Senha:</label>
-                <input class="form-input" type="password" name="password" id="password" placeholder="senha">
+        <x-form-section title="Permissões do Sistema" subtitle="Configure as permissões de acesso do funcionário">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <x-input 
+                    label="Cadastro de Produtos" 
+                    name="cadastro_produtos" 
+                    type="checkbox" 
+                    value="1" 
+                    :checked="$funcionario->cadastro_produtos == '1'" 
+                    help="Permite cadastrar e editar produtos"
+                />
+                
+                <x-input 
+                    label="Ajuste de Estoque" 
+                    name="ajuste_estoque" 
+                    type="checkbox" 
+                    value="1" 
+                    :checked="$funcionario->ajuste_estoque == '1'" 
+                    help="Permite ajustar quantidades em estoque"
+                />
+                
+                <x-input 
+                    label="Vendas no Crediário" 
+                    name="vendas_crediario" 
+                    type="checkbox" 
+                    value="1" 
+                    :checked="$funcionario->vendas_crediario == '1'" 
+                    help="Permite realizar vendas a prazo"
+                />
+                
+                <x-input 
+                    label="Ajuste de Limite" 
+                    name="limite" 
+                    type="checkbox" 
+                    value="1" 
+                    :checked="$funcionario->limite == '1'" 
+                    help="Permite alterar limites de crédito"
+                />
+                
+                <x-input 
+                    label="Recebimentos" 
+                    name="recebimentos" 
+                    type="checkbox" 
+                    value="1" 
+                    :checked="$funcionario->recebimentos == '1'" 
+                    help="Permite registrar recebimentos"
+                />
             </div>
+        </x-form-section>
 
-            <div class="mb-4">
-                <label class="form-label" for="cidade">Cidade:</label>
-                <select class="form-input" name="cidade" id="cidade">
+        <x-slot name="actions">
+            <x-button type="submit" variant="primary" icon="fas fa-save">
+                Atualizar Funcionário
+            </x-button>
+            <x-button variant="secondary" href="{{ route('funcionario.index') }}" icon="fas fa-times">
+                Cancelar
+            </x-button>
+        </x-slot>
+    </x-form>
 
-                    @foreach ($cidades as $cidade)
-                        <option value="{{ $cidade->cidade }}" @if ($funcionario->cidade == $cidade->id) selected @endif>
-                            {{ $cidade->cidade }}
-                        </option>
-                    @endforeach
-
-                </select>
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label" for="cidade">Status:</label>
-                    <select class="form-input" name="status" id="status">
-                        <option value="ativo" @if ($funcionario->status == "ativo") selected @endif>Ativo</option>
-                        <option value="inativo" @if ($funcionario->status == "inativo") selected @endif>Inativo</option>
-                    </select>
-                </div>
-
-                <div class="mb-4">
-                    <img class="h-auto max-w-xs" src="{{ asset('storage/uploads/funcionarios/' . $funcionario->image) }}" alt="{{ $funcionario->name }}" class="img-preview">
-                </div>
-
-                <div class="mb-4">
-                    <label class="form-label" for="image">Foto:</label>
-                    <input class="form-file" id="image" name="image" type="file" accept="image/*">
-                </div>
-
-                <div class="mb-4">
-                <label class="inline-flex items-center mb-5 cursor-pointer">
-                    <input name="cadastro_produtos" type="checkbox" value="1" class="sr-only peer"
-                    @if ($funcionario->cadastro_produtos == '1') checked @endif>
-                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 dark:peer-focus:ring-lime-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-600 dark:peer-checked:bg-lime-600"></div>
-                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Cadastro de produtos</span>
-                  </label>
-                </div>
-
-                <div class="mb-4">
-                    <label class="inline-flex items-center mb-5 cursor-pointer">
-                        <input name="ajuste_estoque" type="checkbox" value="1" class="sr-only peer"
-                        @if ($funcionario->ajuste_estoque == '1') checked @endif>
-                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 dark:peer-focus:ring-lime-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-600 dark:peer-checked:bg-lime-600"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Ajuste de estoque</span>
-                      </label>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="inline-flex items-center mb-5 cursor-pointer">
-                            <input name="vendas_crediario" type="checkbox" value="1" class="sr-only peer"
-                            @if ($funcionario->vendas_crediario == '1') checked @endif>
-                            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 dark:peer-focus:ring-lime-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-600 dark:peer-checked:bg-lime-600"></div>
-                            <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Vendas no crediário</span>
-                          </label>
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="inline-flex items-center mb-5 cursor-pointer">
-                                <input name="limite" type="checkbox" value="1" class="sr-only peer"
-                                @if ($funcionario->limite == '1') checked @endif>
-                                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 dark:peer-focus:ring-lime-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-600 dark:peer-checked:bg-lime-600"></div>
-                                <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Ajuste de limite</span>
-                              </label>
-                            </div>
-
-                            <div class="mb-4">
-                                <label class="inline-flex items-center mb-5 cursor-pointer">
-                                    <input name="recebimentos" type="checkbox" value="1" class="sr-only peer"
-                                    @if ($funcionario->recebimentos == '1') checked @endif>
-                                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 dark:peer-focus:ring-lime-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-600 dark:peer-checked:bg-lime-600"></div>
-                                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Recebimentos</span>
-                                  </label>
-                                </div>
-
-        <input class="btn-blue" type="submit" value="Editar">
-    </form>
-
-    </div>
+</div>
 
 @endsection

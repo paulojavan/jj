@@ -1,27 +1,46 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Cadastro de grupos</h1>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Editar Grupo" 
+        subtitle="Atualize as informações do grupo" 
+        icon="fas fa-edit">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-list" href="{{ route('grupos.index') }}">
+                Listar Grupos
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('grupos.update', $grupo->id) }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        @method('PUT')
-        <div class="mb-4">
-        <label class="form-label" for="grupo" >Nome da grupo:</label>
-        <input class="form-input" type="text" name="grupo" id="grupo" placeholder="Nome do grupo" value="{{ $grupo->grupo ?? old('grupo') }}" required >
+    <x-form 
+        title="Dados do Grupo" 
+        subtitle="Atualize as informações do grupo" 
+        action="{{ route('grupos.update', $grupo->id) }}" 
+        method="PUT"
+    >
+        <x-input 
+            label="Nome do Grupo" 
+            name="grupo" 
+            type="text" 
+            placeholder="Nome do grupo" 
+            :value="$grupo->grupo ?? old('grupo')" 
+            icon="fas fa-layer-group" 
+            required="true" 
+        />
+        
+        <div class="flex justify-end space-x-3">
+            <x-button variant="secondary" href="{{ route('grupos.index') }}">
+                Cancelar
+            </x-button>
+            <x-button type="submit" variant="success">
+                Atualizar Grupo
+            </x-button>
         </div>
+    </x-form>
 
-        <div class="mb-4 text-center">
-        <input class="btn-green" type="submit" value="Atualizar grupo">
-        </div>
-    </form>
-
-    </div>
-
+</div>
 
 @endsection

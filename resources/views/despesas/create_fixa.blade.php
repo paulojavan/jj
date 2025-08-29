@@ -1,43 +1,72 @@
 @extends('layouts.base')
 
 @section('content')
-<div class="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-    <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Cadastrar Despesa Fixa</h1>
-    <form method="POST" action="{{ route('despesas.store.fixa') }}">
-        @csrf
-        <div class="mb-4">
-            <label for="dia" class="block text-sm font-medium text-gray-700">Dia Aproximado</label>
-            <select name="dia" id="dia" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                @for ($i = 1; $i <= 31; $i++)
-                    <option value="{{ $i }}">{{ $i }}</option>
-                @endfor
-            </select>
-        </div>
-        <div class="mb-4">
-            <label for="tipo" class="block text-sm font-medium text-gray-700">Tipo de Despesa</label>
-            <input type="text" name="tipo" id="tipo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-        </div>
-        <div class="mb-4">
-            <label for="empresa" class="block text-sm font-medium text-gray-700">Nome da Empresa</label>
-            <input type="text" name="empresa" id="empresa" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-        </div>
-        <div class="mb-4">
-            <label for="valor" class="block text-sm font-medium text-gray-700">Valor</label>
-            <input type="text" name="valor" id="valor" class="valor-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-        </div>
-        @if(count($cidades) > 0)
-        <div class="mb-4">
-            <label for="cidade" class="block text-sm font-medium text-gray-700">Cidade</label>
-            <select name="cidade_id" id="cidade" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
-                @foreach($cidades as $cidade)
-                    <option value="{{ $cidade->id }}">{{ $cidade->cidade }}</option>
-                @endforeach
-            </select>
-        </div>
-        @endif
-        <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">Cadastrar</button>
-    </form>
-</div>
+<x-page-header 
+    title="Cadastrar Despesa Fixa" 
+    subtitle="Adicione uma nova despesa fixa ao sistema" 
+    icon="fas fa-plus-circle" 
+/>
+
+<x-alert />
+
+<x-form 
+    title="Dados da Despesa Fixa" 
+    subtitle="Preencha as informações da despesa fixa" 
+    action="{{ route('despesas.store.fixa') }}" 
+    method="POST"
+>
+    <x-input 
+        label="Dia Aproximado" 
+        name="dia" 
+        type="select" 
+        required="true" 
+        :options="collect(range(1, 31))->mapWithKeys(fn($i) => [$i => $i])"
+    />
+    
+    <x-input 
+        label="Tipo de Despesa" 
+        name="tipo" 
+        type="text" 
+        placeholder="Ex: Aluguel, Energia, Água..." 
+        required="true" 
+    />
+    
+    <x-input 
+        label="Nome da Empresa" 
+        name="empresa" 
+        type="text" 
+        placeholder="Nome da empresa fornecedora" 
+        required="true" 
+    />
+    
+    <x-input 
+        label="Valor" 
+        name="valor" 
+        type="text" 
+        placeholder="R$ 0,00" 
+        required="true" 
+        class="valor-input" 
+    />
+    
+    @if(count($cidades) > 0)
+    <x-input 
+        label="Cidade" 
+        name="cidade_id" 
+        type="select" 
+        required="true" 
+        :options="$cidades->pluck('cidade', 'id')"
+    />
+    @endif
+    
+    <div class="flex justify-end space-x-3">
+        <a href="{{ route('despesas.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            Cancelar
+        </a>
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Cadastrar Despesa Fixa
+        </button>
+    </div>
+</x-form>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

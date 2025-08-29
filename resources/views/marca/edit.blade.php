@@ -1,27 +1,46 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Cadastro de Marcas</h1>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Editar Marca" 
+        subtitle="Atualize as informações da marca" 
+        icon="fas fa-edit">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-list" href="{{ route('marcas.index') }}">
+                Listar Marcas
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('marcas.update', $marca) }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        @method('PUT')
-        <div class="mb-4">
-        <label class="form-label" for="marca" >Nome da marca:</label>
-        <input class="form-input" type="text" name="marca" id="marca" placeholder="Nome da marca" value="{{ $marca->marca ?? old('marca') }}" required >
+    <x-form 
+        title="Dados da Marca" 
+        subtitle="Atualize as informações da marca" 
+        action="{{ route('marcas.update', $marca) }}" 
+        method="PUT"
+    >
+        <x-input 
+            label="Nome da Marca" 
+            name="marca" 
+            type="text" 
+            placeholder="Nome da marca" 
+            :value="$marca->marca ?? old('marca')" 
+            icon="fas fa-tags" 
+            required="true" 
+        />
+        
+        <div class="flex justify-end space-x-3">
+            <x-button variant="secondary" href="{{ route('marcas.index') }}">
+                Cancelar
+            </x-button>
+            <x-button type="submit" variant="success">
+                Atualizar Marca
+            </x-button>
         </div>
+    </x-form>
 
-        <div class="mb-4 text-center">
-        <input class="btn-green" type="submit" value="Atualizar marca">
-        </div>
-    </form>
-
-    </div>
-
+</div>
 
 @endsection

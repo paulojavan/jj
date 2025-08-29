@@ -156,7 +156,12 @@ class FluxoCaixaService
      */
     private function obterVendedoresCidade($cidadeId, $usuario, $nomeCidade, $dataInicio, $dataFim)
     {
-        // Buscar vendedores que tenham vendas ou recebimentos na cidade no período
+        // Se não for administrador, mostra apenas o próprio usuário
+        if ($usuario->nivel !== 'administrador') {
+            return User::where('id', $usuario->id)->get();
+        }
+
+        // Para administradores, buscar vendedores que tenham vendas ou recebimentos na cidade no período
         $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
         
         // Buscar IDs de vendedores que fizeram vendas
@@ -243,70 +248,15 @@ class FluxoCaixaService
         $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
         
         return $this->executarConsultaSegura(function() use ($tabelaVendas, $vendedorId, $dataInicio, $dataFim) {
-            $parcelas = Parcela::with('cliente')
-                ->where('id_vendedor', $vendedorId)
+            return Parcela::where('id_vendedor', $vendedorId)
                 ->where('bd', $tabelaVendas)
                 ->whereBetween('data_pagamento', [$dataInicio, $dataFim])
                 ->whereNotNull('data_pagamento')
+                ->orderBy('metodo')
                 ->orderBy('data_pagamento')
                 ->orderBy('hora')
-                ->orderBy(function($query) {
-                    $query->select('nome')
-                        ->from('clientes')
-                        ->whereColumn('clientes.id', 'parcelas.id_cliente')
-                        ->limit(1);
-                })
-                ->get();
-
-            // Agrupar por data e cliente
-            $agrupados = [];
-            foreach ($parcelas as $parcela) {
-                $data = $parcela->data_pagamento;
-                $clienteId = $parcela->id_cliente;
-                $nomeCliente = $parcela->cliente ? $parcela->cliente->nome : 'Cliente não encontrado';
-                
-                $chave = $data . '_' . $clienteId;
-                
-                if (!isset($agrupados[$chave])) {
-                    $agrupados[$chave] = [
-                        'data_pagamento' => $data,
-                        'cliente_id' => $clienteId,
-                        'cliente_nome' => $nomeCliente,
-                        'total_dinheiro' => 0,
-                        'total_pix' => 0,
-                        'total_cartao' => 0,
-                        'total_geral' => 0,
-                        'parcelas' => []
-                    ];
-                }
-                
-                // Somar valores
-                $agrupados[$chave]['total_dinheiro'] += $parcela->dinheiro ?? 0;
-                $agrupados[$chave]['total_pix'] += $parcela->pix ?? 0;
-                $agrupados[$chave]['total_cartao'] += $parcela->cartao ?? 0;
-                $agrupados[$chave]['total_geral'] += $parcela->valor_parcela ?? 0;
-                
-                // Adicionar parcela aos detalhes
-                $agrupados[$chave]['parcelas'][] = [
-                    'id' => $parcela->id,
-                    'valor_parcela' => $parcela->valor_parcela,
-                    'dinheiro' => $parcela->dinheiro ?? 0,
-                    'pix' => $parcela->pix ?? 0,
-                    'cartao' => $parcela->cartao ?? 0,
-                    'hora' => $parcela->hora,
-                    'data_pagamento' => $parcela->data_pagamento
-                ];
-            }
-            
-            // Ordenar por data e nome do cliente
-            uasort($agrupados, function($a, $b) {
-                if ($a['data_pagamento'] === $b['data_pagamento']) {
-                    return strcmp($a['cliente_nome'], $b['cliente_nome']);
-                }
-                return strcmp($a['data_pagamento'], $b['data_pagamento']);
-            });
-            
-            return array_values($agrupados);
+                ->get()
+                ->toArray();
         }, "Consulta recebimentos vendedor {$vendedorId} em {$nomeCidade}");
     }
 
@@ -388,10 +338,10 @@ class FluxoCaixaService
         ];
 
         foreach ($recebimentos as $recebimento) {
-            // Tratar tanto objetos quanto arrays - agora usando os campos corretos dos dados agrupados
-            $dinheiro = is_object($recebimento) ? ($recebimento->total_dinheiro ?? 0) : ($recebimento['total_dinheiro'] ?? 0);
-            $pix = is_object($recebimento) ? ($recebimento->total_pix ?? 0) : ($recebimento['total_pix'] ?? 0);
-            $cartao = is_object($recebimento) ? ($recebimento->total_cartao ?? 0) : ($recebimento['total_cartao'] ?? 0);
+            // Tratar tanto objetos quanto arrays
+            $dinheiro = is_object($recebimento) ? ($recebimento->dinheiro ?? 0) : ($recebimento['dinheiro'] ?? 0);
+            $pix = is_object($recebimento) ? ($recebimento->pix ?? 0) : ($recebimento['pix'] ?? 0);
+            $cartao = is_object($recebimento) ? ($recebimento->cartao ?? 0) : ($recebimento['cartao'] ?? 0);
 
             $resumo['total_dinheiro'] += $dinheiro;
             $resumo['total_pix'] += $pix;
@@ -505,13 +455,8 @@ class FluxoCaixaService
 
         $resumoGeral['vendas']['total_geral'] = array_sum($resumoGeral['vendas']);
         $resumoGeral['recebimentos']['total_geral'] = array_sum($resumoGeral['recebimentos']);
-        
-        // Calcula total de dinheiro (vendas à vista + recebimentos de parcelas)
-        $resumoGeral['recebimentos']['total_dinheiro_completo'] =
-            $resumoGeral['vendas']['total_dinheiro'] + $resumoGeral['recebimentos']['total_dinheiro'];
-        
         $resumoGeral['recebimentos']['total_dinheiro_liquido'] =
-            $resumoGeral['recebimentos']['total_dinheiro_completo'] - $resumoGeral['despesas']['total'];
+            $resumoGeral['recebimentos']['total_dinheiro'] - $resumoGeral['despesas']['total'];
 
         return $resumoGeral;
     }
@@ -539,18 +484,35 @@ class FluxoCaixaService
 
     /**
      * Verifica se uma tabela existe no banco de dados
+     * Cache do resultado para evitar verificações repetidas
      */
     private function tabelaExiste($nomeTabela)
     {
-        try {
-            DB::select("SELECT 1 FROM {$nomeTabela} LIMIT 1");
-            return true;
-        } catch (\Exception $e) {
-            Log::warning("Tabela não encontrada: {$nomeTabela}", [
-                'erro' => $e->getMessage()
-            ]);
-            return false;
-        }
+        // Cache da verificação por 1 hora para evitar consultas repetidas
+        $cacheKey = "tabela_existe_{$nomeTabela}";
+        
+        return Cache::remember($cacheKey, 3600, function() use ($nomeTabela) {
+            try {
+                // Usa INFORMATION_SCHEMA para verificação mais eficiente
+                $resultado = DB::select(
+                    "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?",
+                    [$nomeTabela]
+                );
+                
+                $existe = !empty($resultado);
+                
+                if (!$existe) {
+                    Log::info("Tabela não encontrada no banco de dados: {$nomeTabela}");
+                }
+                
+                return $existe;
+            } catch (\Exception $e) {
+                Log::error("Erro ao verificar existência da tabela: {$nomeTabela}", [
+                    'erro' => $e->getMessage()
+                ]);
+                return false;
+            }
+        });
     }
 
     /**
@@ -575,24 +537,42 @@ class FluxoCaixaService
     }
 
     /**
-     * Executa consulta com tratamento de erro
+     * Executa consulta com tratamento de erro aprimorado
      */
     private function executarConsultaSegura($callback, $contexto = '')
     {
         try {
             return $callback();
         } catch (\Exception $e) {
+            $mensagemErro = $e->getMessage();
+            
+            // Log detalhado para debugging
             Log::error("Erro na consulta de fluxo de caixa: {$contexto}", [
-                'erro' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'erro' => $mensagemErro,
+                'codigo_erro' => $e->getCode(),
+                'arquivo' => $e->getFile(),
+                'linha' => $e->getLine()
             ]);
 
-            // Re-throw com mensagem mais amigável se necessário
-            if (str_contains($e->getMessage(), "doesn't exist")) {
-                throw new \Exception("Tabela de dados não encontrada. Verifique a configuração da cidade.");
+            // Mensagens de erro mais específicas e amigáveis
+            if (str_contains($mensagemErro, "doesn't exist") || str_contains($mensagemErro, "Table") && str_contains($mensagemErro, "doesn't exist")) {
+                // Extrair nome da tabela do erro se possível
+                preg_match("/Table '.*?\.(.*?)' doesn't exist/", $mensagemErro, $matches);
+                $nomeTabela = $matches[1] ?? 'desconhecida';
+                
+                throw new \Exception("A tabela '{$nomeTabela}' não foi encontrada no banco de dados. Verifique se as migrations foram executadas corretamente.");
+            }
+            
+            if (str_contains($mensagemErro, "Connection refused") || str_contains($mensagemErro, "Access denied")) {
+                throw new \Exception("Erro de conexão com o banco de dados. Verifique as configurações de conexão.");
+            }
+            
+            if (str_contains($mensagemErro, "Syntax error")) {
+                throw new \Exception("Erro de sintaxe na consulta SQL. Contate o suporte técnico.");
             }
 
-            throw $e;
+            // Para outros erros, manter a mensagem original mas com contexto
+            throw new \Exception("Erro no processamento dos dados de fluxo de caixa: " . $mensagemErro);
         }
     }
 

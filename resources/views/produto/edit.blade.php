@@ -1,102 +1,165 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Editar - {{ $produto->produto }}</h1>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Editar Produto" 
+        subtitle="Atualize as informações do produto: {{ $produto->produto }}" 
+        icon="fas fa-edit">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-list" href="{{ route('produtos.index') }}">
+                Listar Produtos
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('produtos.update', $produto->id) }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-4">
-        <label class="form-label" for="produto" >Produto:</label>
-        <input class="form-input" type="text" name="produto" id="produto" placeholder="Produto" value="{{ $produto->produto }}" >
+    <x-form 
+        title="Dados do Produto" 
+        subtitle="Atualize as informações do produto" 
+        action="{{ route('produtos.update', $produto->id) }}" 
+        method="PUT"
+        enctype="multipart/form-data"
+    >
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <x-input 
+                label="Nome do Produto" 
+                name="produto" 
+                type="text" 
+                placeholder="Nome do produto" 
+                :value="$produto->produto" 
+                icon="fas fa-shoe-prints" 
+                required="true" 
+            />
+            
+            <x-input 
+                label="Marca" 
+                name="marca" 
+                type="select" 
+                icon="fas fa-tags" 
+                required="true"
+                :options="$marcas->pluck('marca', 'marca')->toArray()"
+                :value="$produto->marca"
+            />
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <x-input 
+                label="Gênero" 
+                name="genero" 
+                type="select" 
+                icon="fas fa-venus-mars" 
+                required="true"
+                :options="['masculino' => 'Masculino', 'feminino' => 'Feminino']"
+                :value="$produto->genero"
+            />
+            
+            <x-input 
+                label="Grupo" 
+                name="grupo" 
+                type="select" 
+                icon="fas fa-layer-group" 
+                required="true"
+                :options="$grupos->pluck('grupo', 'grupo')->toArray()"
+                :value="$produto->grupo"
+            />
+            
+            <x-input 
+                label="Subgrupo" 
+                name="subgrupo" 
+                type="select" 
+                icon="fas fa-sitemap" 
+                required="true"
+                :options="$subgrupos->pluck('subgrupo', 'subgrupo')->toArray()"
+                :value="$produto->subgrupo"
+            />
         </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="marca" >Marca:</label>
-        <select class="form-input" name="marca" id="marca">
-            @foreach ($marcas as $marca)
-                <option value="{{ $marca->marca }}" @if($marca->marca == $produto->marca) selected @endif>{{ $marca->marca }}</option>
-            @endforeach
-        </select>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <x-input 
+                label="Código" 
+                name="codigo" 
+                type="text" 
+                placeholder="Código do produto" 
+                :value="$produto->codigo" 
+                icon="fas fa-barcode" 
+                required="true" 
+            />
+            
+            <x-input 
+                label="Quantidade" 
+                name="quantidade" 
+                type="number" 
+                placeholder="Quantidade em estoque" 
+                :value="$produto->quantidade" 
+                icon="fas fa-boxes" 
+                required="true" 
+            />
         </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="genero" >Genero:</label>
-            <select class="form-input" name="genero" id="genero">
-                <option value="masculino" @if($produto->genero == "masculino") selected @endif>Masculino</option>
-                <option value="feminino" @if($produto->genero == "feminino") selected @endif>Feminino</option>
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="grupo" >Grupo:</label>
-            <select class="form-input" name="grupo" id="grupo">
-                @foreach ($grupos as $grupo)
-                <option value="{{ $grupo->grupo }}" @if($grupo->grupo == $produto->grupo) selected @endif>{{ $grupo->grupo }}</option>
-            @endforeach
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="subgrupo" >Sub-grupo:</label>
-            <select class="form-input" name="subgrupo" id="subgrupo">
-                @foreach ($subgrupos as $subgrupo)
-                    <option value="{{ $subgrupo->subgrupo }}" @if($subgrupo->subgrupo == $produto->subgrupo) selected @endif>{{ $subgrupo->subgrupo }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="codigo" >Codigo:</label>
-            <input class="form-input" type="text" name="codigo" id="codigo" placeholder="Codigo" value="{{ $produto->codigo }}" >
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="quantidade" >Quantidade:</label>
-            <input class="form-input" type="number" name="quantidade" id="quantidade" placeholder="Quantidade" value="{{ $produto->quantidade }}" >
-        </div>
-
-        <div class="mb-4 flex flex-col md:flex-row">
-            <div class="flex-1">
-                <label class="form-label" for="num1" >Número Inicial:</label>
-                <select class="form-input" name="num1" id="num1">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-sort-numeric-up mr-2"></i>Número Inicial
+                </label>
+                <select name="num1" id="num1" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @for ($i = 14; $i <= $produto->num1; $i++)
-                        <option value="{{ $i }}"  @if($i == $produto->num1) selected @endif>{{ $i }}</option>
+                        <option value="{{ $i }}" @if($i == $produto->num1) selected @endif>{{ $i }}</option>
                     @endfor
                 </select>
             </div>
-            <div class="flex-1">
-                <label class="form-label" for="num2" >Número Final:</label>
-                <select class="form-input" name="num2" id="num2">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-sort-numeric-down mr-2"></i>Número Final
+                </label>
+                <select name="num2" id="num2" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     @for ($i = $produto->num2; $i <= 46; $i++)
                         <option value="{{ $i }}" @if($i == $produto->num2) selected @endif>{{ $i }}</option>
                     @endfor
                 </select>
             </div>
         </div>
-
-        <div class="mb-4">
-            <label class="form-label" for="preco" >Preço:</label>
-            <input class="form-input" type="text" name="preco" id="preco" placeholder="Preço do produto" value="R$ {{ $produto->preco }}" oninput="formatCurrency(this)" >
+        
+        <x-input 
+            label="Preço" 
+            name="preco" 
+            type="text" 
+            placeholder="Preço do produto" 
+            value="R$ {{ $produto->preco }}" 
+            icon="fas fa-dollar-sign" 
+            required="true"
+            oninput="formatCurrency(this)"
+        />
+        
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-image mr-2"></i>Foto Atual do Produto
+            </label>
+            <div class="text-center mb-4">
+                <img class="h-auto max-w-xs mx-auto rounded-lg shadow-md" src="{{ asset('storage/uploads/produtos/' . $produto->foto) }}" alt="{{ $produto->produto }}">
             </div>
-
-        <div class="mb-4">
-            <img class="h-auto max-w-xs mx-auto" src="{{ asset('storage/uploads/produtos/' . $produto->foto) }}" alt="{{ $produto->produto }}" class="img-preview"><br>
-            <label class="form-label" for="foto">Foto do produto:</label>
-            <input class="form-file" id="foto" name="foto" type="file" accept="image/*" >
+            <x-input 
+                label="Nova Foto do Produto" 
+                name="foto" 
+                type="file" 
+                accept="image/*" 
+                icon="fas fa-camera" 
+            />
         </div>
-
-        <div class="mb-4 text-center">
-        <input class="btn-green" type="submit" value="Alterar produto">
-        <a href="{{ route('produtos.distribuicao', $produto->id) }}" class="btn-blue">Distribuir Numerações</a>
-        </div>
-    </form>
+        
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-times" href="{{ route('produtos.index') }}">
+                Cancelar
+            </x-button>
+            <x-button variant="primary" type="submit" icon="fas fa-save">
+                Atualizar Produto
+            </x-button>
+            <x-button variant="info" icon="fas fa-chart-pie" href="{{ route('produtos.distribuicao', $produto->id) }}">
+                Distribuir Numerações
+            </x-button>
+        </x-slot>
+    </x-form>
 
     </div>
 

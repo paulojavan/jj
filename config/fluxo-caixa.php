@@ -31,6 +31,16 @@ return [
             'tabela_vendas' => 'vendas_princesa',
             'tabela_despesas' => 'despesas_princesa',
         ],
+        'tavares' => [
+            'nome' => 'Tavares',
+            'tabela_vendas' => 'vendas_tavares',
+            'tabela_despesas' => 'despesas_tavares',
+        ],
+        'agua_branca' => [
+            'nome' => 'Água Branca',
+            'tabela_vendas' => 'vendas_agua_branca',
+            'tabela_despesas' => 'despesas_agua_branca',
+        ],
     ],
 
     // Configurações de relatório

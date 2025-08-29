@@ -11,79 +11,129 @@
     @endphp
 @endif
 
-    <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Cadastro de Autorização</h1>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Editar Pessoa Autorizada" 
+        subtitle="Atualize as informações da pessoa autorizada" 
+        icon="fas fa-user-edit">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-arrow-left" href="{{ route('clientes.edit', ['cliente' => $autorizado->idCliente]) }}">
+                Voltar ao Cliente
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('autorizados.update', ['autorizado' => $autorizado->id]) }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        @method('PUT')
-        <h1 class="text-center">Dados pessoais</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="nome" >Nome completo:</label>
-        <input class="form-input" type="text" name="nome" id="nome" placeholder="Nome do autorizado" value="{{ old('nome', $autorizado->nome) }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="rg" >Rg:</label>
-        <input class="form-input" type="text" name="rg" id="rg" placeholder="RG do autorizado" value="{{ old('rg', $autorizado->rg) }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="cpf" >CPF:</label>
-        <input class="form-input" type="text" name="cpf" id="cpf" placeholder="CPF do autorizado" value="{{ old('cpf', $autorizado->cpf) }}" >
-        </div>
-
+    <x-form 
+        title="Dados da Pessoa Autorizada" 
+        subtitle="Atualize as informações da pessoa autorizada" 
+        action="{{ route('autorizados.update', ['autorizado' => $autorizado->id]) }}" 
+        method="PUT"
+        enctype="multipart/form-data"
+    >
         <input type="hidden" name="autorizado_id" value="{{ request()->route('autorizado_id') }}">
-
-        <br><h1 class="text-center">Fotos:</h1><hr><br>
-        <div class="mb-4 text-center">
-            <img class="h-auto max-w-xs mx-auto" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->foto) }}" alt="{{ $autorizado->name }}" class="img-preview"><br>
-            @if(@isset($autorizado->foto))
-            <button type="button" id="foto" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="btn-blue">Alterar foto</button>
-            <br>
-            @endif
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Dados Pessoais</h3>
+            
+            <x-input 
+                label="Nome Completo" 
+                name="nome" 
+                type="text" 
+                placeholder="Nome completo da pessoa autorizada" 
+                :value="old('nome', $autorizado->nome)" 
+                icon="fas fa-user" 
+            />
+            
+            <x-input 
+                label="RG" 
+                name="rg" 
+                type="text" 
+                placeholder="RG da pessoa autorizada" 
+                :value="old('rg', $autorizado->rg)" 
+                icon="fas fa-id-card" 
+            />
+            
+            <x-input 
+                label="CPF" 
+                name="cpf" 
+                type="text" 
+                placeholder="CPF da pessoa autorizada" 
+                :value="old('cpf', $autorizado->cpf)" 
+                icon="fas fa-id-card-alt" 
+            />
         </div>
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Fotos e Documentos</h3>
+            
+            <div class="mb-4 text-center">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Foto Principal</label>
+                    <img class="h-auto max-w-xs mx-auto rounded-lg shadow-md" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->foto) }}" alt="{{ $autorizado->nome }}" class="img-preview">
+                    @if(@isset($autorizado->foto))
+                    <button type="button" id="foto" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Alterar Foto
+                    </button>
+                    @endif
+                </div>
+            </div>
 
-        <div class="mb-4 text-center">
-            <div class="flex flex-wrap justify-center">
-                <div class="w-full md:w-1/3 mb-4">
-                    <img class="h-auto max-w-xs mx-auto" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->rg_frente) }}" alt="{{ $autorizado->name }}" class="img-preview"><br>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="text-center">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">RG Frente</label>
+                    <img class="h-auto max-w-xs mx-auto rounded-lg shadow-md" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->rg_frente) }}" alt="{{ $autorizado->nome }}" class="img-preview">
                     @if(is_null($autorizado->rg_frente))
-                    <button type="button" id="rg_frente" data-modal-target="documentos" data-modal-toggle="documentos" class="btn-blue">RG Frente</button>
+                    <button type="button" id="rg_frente" data-modal-target="documentos" data-modal-toggle="documentos" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Adicionar RG Frente
+                    </button>
                     @else
-                    <button type="button" id="rg_frente" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="btn-blue">RG Frente</button>
+                    <button type="button" id="rg_frente" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Alterar RG Frente
+                    </button>
                     @endif
                 </div>
-                <div class="w-full md:w-1/3 mb-4">
-                    <img class="h-auto max-w-xs mx-auto" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->rg_verso) }}" alt="{{ $autorizado->name }}" class="img-preview"><br>
+                <div class="text-center">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">RG Verso</label>
+                    <img class="h-auto max-w-xs mx-auto rounded-lg shadow-md" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->rg_verso) }}" alt="{{ $autorizado->nome }}" class="img-preview">
                     @if(is_null($autorizado->rg_verso))
-                    <button type="button" id="rg_verso" data-modal-target="documentos" data-modal-toggle="documentos" class="btn-blue">RG Verso</button>
+                    <button type="button" id="rg_verso" data-modal-target="documentos" data-modal-toggle="documentos" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Adicionar RG Verso
+                    </button>
                     @else
-                    <button type="button" id="rg_verso" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="btn-blue">RG Verso</button>
+                    <button type="button" id="rg_verso" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Alterar RG Verso
+                    </button>
                     @endif
                 </div>
-                <div class="w-full md:w-1/3 mb-4">
-                    <img class="h-auto max-w-xs mx-auto" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->cpf_foto) }}" alt="{{ $autorizado->name }}" class="img-preview"><br>
+                <div class="text-center">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">CPF</label>
+                    <img class="h-auto max-w-xs mx-auto rounded-lg shadow-md" src="{{ asset('storage/uploads/clientes/' . $pasta . '/' . $autorizado->cpf_foto) }}" alt="{{ $autorizado->nome }}" class="img-preview">
                     @if(is_null($autorizado->cpf_foto))
-                    <button type="button" id="cpf_foto" data-modal-target="documentos" data-modal-toggle="documentos" class="btn-blue">CPF</button>
+                    <button type="button" id="cpf_foto" data-modal-target="documentos" data-modal-toggle="documentos" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Adicionar CPF
+                    </button>
                     @else
-                    <button type="button" id="cpf_foto" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="btn-blue">CPF</button>
+                    <button type="button" id="cpf_foto" data-modal-target="mudar_fotos" data-modal-toggle="mudar_fotos" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Alterar CPF
+                    </button>
                     @endif
                 </div>
             </div>
         </div>
-
-        <div class="mb-4 text-center">
-            <a class="btn-blue" href="{{ route('clientes.edit', $autorizado->idCliente) }}">Voltar</a>
-        <input class="btn-green" type="submit" value="Editar pessoa autorizada">
+        
+        <div class="flex justify-end space-x-3">
+            <a href="{{ route('clientes.edit', $autorizado->idCliente) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Cancelar
+            </a>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Atualizar Pessoa Autorizada
+            </button>
         </div>
-    </form>
+    </x-form>
 
-    </div>
+</div>
 
 
 <!-- Carregar imagem-->

@@ -1,47 +1,52 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="content-title">
-            <h1 class="page-title">Listando todos os grupos</h1>
-            <a href=" {{ route('grupos.create') }} " class="btn-green">Cadastrar novo grupo</a>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Grupos" 
+        subtitle="Gerencie os grupos de produtos" 
+        icon="fas fa-layer-group">
+        <x-slot name="actions">
+            <x-button variant="success" icon="fas fa-plus" href="{{ route('grupos.create') }}">
+                Cadastrar Grupo
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <div class="table-container">
-        <table class="table">
-            <thead>
-                <tr class="table-header">
-                    <th class="table-header">grupos</th>
-                    <th class="table-header center">Ações</th>
-                </tr>
-            </thead>
-
-            <tbody class="table-body">
-                @forelse ($grupos as $grupo)
-                    <tr class="table-row">
-                        <td class="table-cell">{{ $grupo->grupo }}</td>
-                        <td class="table-actions">
-                            <div class="flex flex-col md:flex-row">
-                                <a href="{{ route('grupos.edit', ['grupo' => $grupo->id]) }}" class="btn-blue">Editar</a>
-                                <form id="delete-form-{{ $grupo->id }}" action="{{ route('grupos.destroy', ['grupo' => $grupo->id]) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" name="excluir" id="excluir" class="btn-red" onclick="cofirmDelete({{ $grupo->id }})">Excluir</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <div class="alert-error">
-                        Não há grupos Encontrados
+    <x-table :headers="['Grupo', 'Ações']">
+        @forelse ($grupos as $grupo)
+            <tr class="table-row">
+                <td class="table-cell">{{ $grupo->grupo }}</td>
+                <td class="table-actions">
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <x-button variant="primary" size="sm" icon="fas fa-edit" 
+                                 href="{{ route('grupos.edit', ['grupo' => $grupo->id]) }}">
+                            Editar
+                        </x-button>
+                        <x-button variant="danger" size="sm" icon="fas fa-trash" 
+                                 onclick="confirmDelete({{ $grupo->id }})">
+                            Excluir
+                        </x-button>
+                        <form id="delete-form-{{ $grupo->id }}" action="{{ route('grupos.destroy', ['grupo' => $grupo->id]) }}" method="POST" class="hidden">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                     </div>
-                @endforelse
-            </tbody>
-        </table>
-
-    </div>
+                </td>
+            </tr>
+        @empty
+            <tr class="table-row">
+                <td colspan="2" class="table-cell text-center py-8">
+                    <div class="text-gray-500">
+                        <i class="fas fa-layer-group text-4xl mb-2"></i>
+                        <p>Nenhum grupo encontrado</p>
+                    </div>
+                </td>
+            </tr>
+        @endforelse
+    </x-table>
  <div class="pagination">
         {{ $grupos->links() }}
 </div>

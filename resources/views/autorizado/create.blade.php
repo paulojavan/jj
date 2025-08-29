@@ -1,45 +1,83 @@
 @extends('layouts.base')
 @section('content')
 
-    <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Cadastro de Autorização</h1>
-        </div>
+<div class="content">
+    <x-page-header 
+        title="Cadastro de Pessoa Autorizada" 
+        subtitle="Adicione uma nova pessoa autorizada para o cliente" 
+        icon="fas fa-user-check">
+        <x-slot name="actions">
+            <x-button variant="secondary" icon="fas fa-arrow-left" href="{{ route('clientes.edit', request()->route('cliente_id')) }}">
+                Voltar ao Cliente
+            </x-button>
+        </x-slot>
+    </x-page-header>
 
     <x-alert />
 
-    <form action="{{ route('autorizados.store') }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        <h1 class="text-center">Dados pessoais</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="nome" >Nome completo:</label>
-        <input class="form-input" type="text" name="nome" id="nome" placeholder="Nome do cliente" value="{{ old('nome') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="rg" >Rg:</label>
-        <input class="form-input" type="text" name="rg" id="rg" placeholder="RG do cliente" value="{{ old('rg') }}" >
-        </div>
-
-        <div class="mb-4">
-        <label class="form-label" for="cpf" >CPF:</label>
-        <input class="form-input" type="text" name="cpf" id="cpf" placeholder="CPF do cliente" value="{{ old('cpf') }}" >
-        </div>
-
+    <x-form 
+        title="Dados da Pessoa Autorizada" 
+        subtitle="Preencha as informações da pessoa autorizada" 
+        action="{{ route('autorizados.store') }}" 
+        method="POST"
+        enctype="multipart/form-data"
+    >
         <input type="hidden" name="cliente_id" value="{{ request()->route('cliente_id') }}">
-
-        <br><h1 class="text-center">Foto:</h1><hr><br>
-        <div class="mb-4">
-            <label class="form-label" for="foto">Foto da pessoa autorizada:</label>
-            <input class="form-file" id="foto" name="foto" type="file" multiple accept="image/*" >
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Dados Pessoais</h3>
+            
+            <x-input 
+                label="Nome Completo" 
+                name="nome" 
+                type="text" 
+                placeholder="Nome completo da pessoa autorizada" 
+                :value="old('nome')" 
+                icon="fas fa-user" 
+            />
+            
+            <x-input 
+                label="RG" 
+                name="rg" 
+                type="text" 
+                placeholder="RG da pessoa autorizada" 
+                :value="old('rg')" 
+                icon="fas fa-id-card" 
+            />
+            
+            <x-input 
+                label="CPF" 
+                name="cpf" 
+                type="text" 
+                placeholder="CPF da pessoa autorizada" 
+                :value="old('cpf')" 
+                icon="fas fa-id-card-alt" 
+            />
         </div>
-
-        <div class="mb-4 text-center">
-            <a class="btn-blue" href="{{ route('clientes.edit', request()->route('cliente_id')) }}">Voltar</a>
-        <input class="btn-green" type="submit" value="Cadastrar pessoa autorizada">
+        
+        <div class="mb-6">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Foto</h3>
+            
+            <x-input 
+                label="Foto da Pessoa Autorizada" 
+                name="foto" 
+                type="file" 
+                accept="image/*" 
+                icon="fas fa-camera" 
+                help="Selecione uma foto da pessoa autorizada" 
+            />
         </div>
-    </form>
+        
+        <div class="flex justify-end space-x-3">
+            <a href="{{ route('clientes.edit', request()->route('cliente_id')) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Cancelar
+            </a>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Cadastrar Pessoa Autorizada
+            </button>
+        </div>
+    </x-form>
 
-    </div>
+</div>
 
 @endsection

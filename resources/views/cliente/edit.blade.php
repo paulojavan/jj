@@ -13,126 +13,240 @@
 @endif
 
     <div class="content">
-        <div class="text-center">
-            <h1 class="page-title">Editar cadastro</h1>
-        </div>
+        <x-page-header
+            title="Editar Cliente"
+            subtitle="Atualize as informações do cliente: {{ $cliente->nome }}"
+            icon="fas fa-user-edit">
+            <x-slot name="actions">
+                <x-button variant="secondary" icon="fas fa-list" href="{{ route('clientes.index') }}">
+                    Listar Clientes
+                </x-button>
+            </x-slot>
+        </x-page-header>
 
-    <x-alert />
+        <x-alert />
 
-    @if(!empty($cliente->obs) && trim($cliente->obs) !== '')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    title: 'Observação do Cliente',
-                    html: '<div class="text-left"><strong>{{ $cliente->nome }}</strong><br><br>{{ $cliente->obs }}</div>',
-                    icon: 'info',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#3085d6',
-                    customClass: {
-                        popup: 'swal-wide'
-                    }
+        @if(!empty($cliente->obs) && trim($cliente->obs) !== '')
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    Swal.fire({
+                        title: 'Observação do Cliente',
+                        html: '<div class="text-left"><strong>{{ $cliente->nome }}</strong><br><br>{{ $cliente->obs }}</div>',
+                        icon: 'info',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#3085d6',
+                        customClass: {
+                            popup: 'swal-wide'
+                        }
+                    });
                 });
-            });
-        </script>
-        <style>
-            .swal-wide {
-                width: 600px !important;
-            }
-        </style>
-    @endif
+            </script>
+            <style>
+                .swal-wide {
+                    width: 600px !important;
+                }
+            </style>
+        @endif
 
-    <form action="{{ route('clientes.update', ['cliente' => $cliente->id]) }}" method="post" enctype="multipart/form-data" class="form-container">
-        @csrf
-        @method('PUT')
-        <h1 class="text-center">Dados pessoais</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="nome" >Nome completo:</label>
-        <input class="form-input" type="text" name="nome" id="nome" placeholder="Nome do cliente" value="{{ $cliente->nome }}" >
-        </div>
+        <x-form
+            title="Dados do Cliente"
+            subtitle="Atualize as informações pessoais do cliente"
+            action="{{ route('clientes.update', ['cliente' => $cliente->id]) }}"
+            method="PUT"
+            enctype="multipart/form-data"
+        >
+            <x-form-section title="Dados Pessoais" subtitle="Informações básicas do cliente">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Nome Completo"
+                        name="nome"
+                        type="text"
+                        placeholder="Nome do cliente"
+                        :value="$cliente->nome"
+                        icon="fas fa-user"
+                        required="true"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="apelido" >Apelido:</label>
-        <input class="form-input" type="text" name="apelido" id="apelido" placeholder="Apelido do cliente" value="{{ $cliente->apelido }}">
-        </div>
+                    <x-input
+                        label="Apelido"
+                        name="apelido"
+                        type="text"
+                        placeholder="Apelido do cliente"
+                        :value="$cliente->apelido"
+                        icon="fas fa-smile"
+                    />
+                </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="rg" >Rg:</label>
-        <input class="form-input" type="text" name="rg" id="rg" placeholder="RG do cliente" value="{{ $cliente->rg }}" >
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="RG"
+                        name="rg"
+                        type="text"
+                        placeholder="RG do cliente"
+                        :value="$cliente->rg"
+                        icon="fas fa-id-card"
+                        required="true"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="cpf" >CPF:</label>
-        <input class="form-input" type="text" name="cpf" id="cpf" placeholder="CPF do cliente" value="{{ $cliente->cpf }}" >
-        </div>
+                    <x-input
+                        label="CPF"
+                        name="cpf"
+                        type="text"
+                        placeholder="CPF do cliente"
+                        :value="$cliente->cpf"
+                        icon="fas fa-id-card-alt"
+                        required="true"
+                    />
+                </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="mae">Nome da mãe:</label>
-        <input class="form-input" type="text" name="mae" id="mae" placeholder="Nome da mãe" value="{{ $cliente->mae }}" >
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Nome da Mãe"
+                        name="mae"
+                        type="text"
+                        placeholder="Nome da mãe"
+                        :value="$cliente->mae"
+                        icon="fas fa-female"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="pai">Nome do pai:</label>
-        <input class="form-input" type="text" name="pai" id="pai" placeholder="Nome do pai" value="{{ $cliente->pai }}">
-        </div>
+                    <x-input
+                        label="Nome do Pai"
+                        name="pai"
+                        type="text"
+                        placeholder="Nome do pai"
+                        :value="$cliente->pai"
+                        icon="fas fa-male"
+                    />
+                </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="telefone">Telefone do cliente:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone" id="telefone" placeholder="(XX) XXXXX-XXXX" value="{{ $cliente->telefone }}" >
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <x-input
+                        label="Telefone"
+                        name="telefone"
+                        type="text"
+                        placeholder="(XX) XXXXX-XXXX"
+                        :value="$cliente->telefone"
+                        icon="fas fa-phone"
+                        class="telefone-mask"
+                        required="true"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="nascimento">Data de nascimento:</label>
-        <input class="form-input" type="date" name="nascimento" id="nascimento" value="{{ $cliente->nascimento }}" >
-        </div>
+                    <x-input
+                        label="Data de Nascimento"
+                        name="nascimento"
+                        type="date"
+                        :value="$cliente->nascimento"
+                        icon="fas fa-calendar"
+                        required="true"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="renda">Fonte de renda:</label>
-        <input class="form-input" type="text" name="renda" id="renda" placeholder="Fonte de renda do cliente" value="{{ $cliente->renda }}" >
-        </div>
+                    <x-input
+                        label="Fonte de Renda"
+                        name="renda"
+                        type="text"
+                        placeholder="Fonte de renda do cliente"
+                        :value="$cliente->renda"
+                        icon="fas fa-money-bill"
+                    />
+                </div>
+            </x-form-section>
 
-        <br><h1 class="text-center">Dados da referencia</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="nome_referencia" >Nome da referencia:</label>
-        <input class="form-input" type="text" name="nome_referencia" id="nome_referencia" placeholder="Nome da pessoa de referencia" value="{{ $cliente->nome_referencia }}" >
-        </div>
+            <x-form-section title="Dados da Referência" subtitle="Informações de contato de referência pessoal">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <x-input
+                        label="Nome da Referência"
+                        name="nome_referencia"
+                        type="text"
+                        placeholder="Nome da pessoa de referência"
+                        :value="$cliente->nome_referencia"
+                        icon="fas fa-user-friends"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia">Telefone da referencia:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia" id="telefone_referencia" placeholder="(XX) XXXXX-XXXX" value="{{ $cliente->numero_referencia }}" >
-        </div>
+                    <x-input
+                        label="Telefone da Referência"
+                        name="telefone_referencia"
+                        type="text"
+                        placeholder="(XX) XXXXX-XXXX"
+                        :value="$cliente->numero_referencia"
+                        icon="fas fa-phone"
+                        class="telefone-mask"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="parentesco">Parentesco:</label>
-        <input class="form-input" type="text" name="parentesco" id="parentesco" placeholder="Gráu de parentesco com o cliente" value="{{ $cliente->parentesco_referencia }}" >
-        </div>
+                    <x-input
+                        label="Parentesco"
+                        name="parentesco"
+                        type="text"
+                        placeholder="Grau de parentesco com o cliente"
+                        :value="$cliente->parentesco_referencia"
+                        icon="fas fa-heart"
+                    />
+                </div>
+            </x-form-section>
 
-        <br><h1 class="text-center">Referencias comerciais:</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="referencia_comercial1">Referencia comercial 1:</label>
-        <input class="form-input" type="text" name="referencia_comercial1" id="referencia_comercial1" placeholder="Referencia comercial" value="{{ $cliente->referencia_comercial1 }}">
-        </div>
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia_comercial1">Telefone da referencia comercial 1:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia_comercial1" id="telefone_referencia_comercial1" placeholder="(XX) XXXXX-XXXX" value="{{ $cliente->telefone_referencia_comercial1 }}">
-        </div><br>
+            <x-form-section title="Referências Comerciais" subtitle="Informações de referências comerciais do cliente">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Referência Comercial 1"
+                        name="referencia_comercial1"
+                        type="text"
+                        placeholder="Nome da referência comercial"
+                        :value="$cliente->referencia_comercial1"
+                        icon="fas fa-store"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="referencia_comercial2">Referencia comercial 2:</label>
-        <input class="form-input" type="text" name="referencia_comercial2" id="referencia_comercial2" placeholder="Referencia comercial" value="{{ $cliente->referencia_comercial2 }}">
-        </div>
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia_comercial2">Telefone da referencia comercial 2:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia_comercial2" id="telefone_referencia_comercial2" placeholder="(XX) XXXXX-XXXX" value="{{ $cliente->telefone_referencia_comercial2 }}">
-        </div><br>
+                    <x-input
+                        label="Telefone da Referência 1"
+                        name="telefone_referencia_comercial1"
+                        type="text"
+                        placeholder="(XX) XXXXX-XXXX"
+                        :value="$cliente->telefone_referencia_comercial1"
+                        icon="fas fa-phone"
+                        class="telefone-mask"
+                    />
+                </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="referencia_comercial3">Referencia comercial 3:</label>
-        <input class="form-input" type="text" name="referencia_comercial3" id="referencia_comercial3" placeholder="Referencia comercial" value="{{ $cliente->referencia_comercial3 }}">
-        </div>
-        <div class="mb-4">
-        <label class="form-label" for="telefone_referencia_comercial3">Telefone da referencia comercial 3:</label>
-        <input class="form-input telefone-mask" type="text" name="telefone_referencia_comercial3" id="telefone_referencia_comercial3" placeholder="(XX) XXXXX-XXXX" value="{{ $cliente->telefone_referencia_comercial3 }}">
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Referência Comercial 2"
+                        name="referencia_comercial2"
+                        type="text"
+                        placeholder="Nome da referência comercial"
+                        :value="$cliente->referencia_comercial2"
+                        icon="fas fa-store"
+                    />
+
+                    <x-input
+                        label="Telefone da Referência 2"
+                        name="telefone_referencia_comercial2"
+                        type="text"
+                        placeholder="(XX) XXXXX-XXXX"
+                        :value="$cliente->telefone_referencia_comercial2"
+                        icon="fas fa-phone"
+                        class="telefone-mask"
+                    />
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Referência Comercial 3"
+                        name="referencia_comercial3"
+                        type="text"
+                        placeholder="Nome da referência comercial"
+                        :value="$cliente->referencia_comercial3"
+                        icon="fas fa-store"
+                    />
+
+                    <x-input
+                        label="Telefone da Referência 3"
+                        name="telefone_referencia_comercial3"
+                        type="text"
+                        placeholder="(XX) XXXXX-XXXX"
+                        :value="$cliente->telefone_referencia_comercial3"
+                        icon="fas fa-phone"
+                        class="telefone-mask"
+                    />
+                </div>
+            </x-form-section>
 
         <br><h1 class="text-center">Fotos:</h1><hr><br>
         <div class="mb-4 text-center">
@@ -225,43 +339,79 @@
 
         @if($cliente->autorizados->count() < 3)
         <br>
-            <div class="mb-4 text-center ">
-                <a href="{{ route('autorizados.create', ['cliente_id' => $cliente->id]) }}" class="btn-blue">Cadastrar pessoa autorizada</a>
+          <div class="mb-4 text-center ">
+                <a href="{{ route('autorizados.createWithClient', ['cliente_id' => $cliente->id]) }}" class="btn-blue">Cadastrar pessoa autorizada</a>
             </div>
         @endif
 
 
 
-        <br><h1 class="text-center">Informaçoes de endereço:</h1><hr><br>
-        <div class="mb-4">
-        <label class="form-label" for="rua">Rua:</label>
-        <input class="form-input" type="text" name="rua" id="rua" placeholder="Nome da rua" value="{{ $cliente->rua }}" >
-        </div>
+            <x-form-section title="Informações de Endereço" subtitle="Dados de localização do cliente">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Rua"
+                        name="rua"
+                        type="text"
+                        placeholder="Nome da rua"
+                        :value="$cliente->rua"
+                        icon="fas fa-road"
+                        required="true"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="numero">Número:</label>
-        <input class="form-input" type="number" name="numero" id="numero" placeholder="Numero da casa" value="{{ $cliente->numero }}" >
-        </div>
+                    <x-input
+                        label="Número"
+                        name="numero"
+                        type="number"
+                        placeholder="Número da casa"
+                        :value="$cliente->numero"
+                        icon="fas fa-hashtag"
+                        required="true"
+                    />
+                </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="bairro">Bairro:</label>
-        <input class="form-input" type="text" name="bairro" id="bairro" placeholder="Bairro" value="{{ $cliente->bairro }}" >
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Bairro"
+                        name="bairro"
+                        type="text"
+                        placeholder="Bairro"
+                        :value="$cliente->bairro"
+                        icon="fas fa-map-marker-alt"
+                        required="true"
+                    />
 
-        <div class="mb-4">
-        <label class="form-label" for="referencia">Ponto de referencia:</label>
-        <input class="form-input" type="text" name="referencia" id="referencia" placeholder="Ponro de referencia da casa" value="{{ $cliente->referencia }}" >
-        </div>
+                    <x-input
+                        label="Cidade"
+                        name="cidade"
+                        type="text"
+                        placeholder="Cidade"
+                        :value="$cliente->cidade"
+                        icon="fas fa-city"
+                        required="true"
+                    />
+                </div>
 
-        <div class="mb-4">
-        <label class="form-label" for="cidade">Cidade:</label>
-        <input class="form-input" type="text" name="cidade" id="cidade" placeholder="Cidade" value="{{ $cliente->cidade }}" >
-        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-input
+                        label="Ponto de Referência"
+                        name="referencia"
+                        type="text"
+                        placeholder="Ponto de referência da casa"
+                        :value="$cliente->referencia"
+                        icon="fas fa-map-pin"
+                    />
 
-        <div class="mb-4">
-            <label class="form-label" for="obs">Observação:</label>
-            <input class="form-input" type="text" name="obs" id="obs" placeholder="observação" value="{{ $cliente->obs }}" >
-        </div>
+                    <x-input
+                        label="Observação"
+                        name="obs"
+                        type="text"
+                        placeholder="Observações sobre o cliente"
+                        :value="$cliente->obs"
+                        icon="fas fa-comment"
+                        help="Informações importantes sobre o cliente"
+                    />
+                </div>
+            </x-form-section>
 
         <!-- Informações de Limite -->
         <div class="mb-4 p-4 bg-gray-50 rounded-lg border">
@@ -297,10 +447,15 @@
             </div>
         </div>
 
-        <div class="mb-4 text-center">
-        <button class="btn-green" type="submit">Atualizar informações</button>
-        </div>
-    </form>
+            <x-slot name="actions">
+                <x-button type="submit" variant="primary" icon="fas fa-save">
+                    Atualizar Informações
+                </x-button>
+                <x-button variant="secondary" href="{{ route('clientes.index') }}" icon="fas fa-times">
+                    Cancelar
+                </x-button>
+            </x-slot>
+        </x-form>
 
     </div>
 
