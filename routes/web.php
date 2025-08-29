@@ -132,7 +132,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Rotas para Fluxo de Caixa
     Route::get('/fluxo-caixa', [FluxoCaixaController::class, 'index'])->name('fluxo-caixa.index');
-    Route::post('/fluxo-caixa/relatorio-geral', [FluxoCaixaController::class, 'relatorioGeral'])->name('fluxo-caixa.relatorio-geral');
+    Route::match(['GET', 'POST'], '/fluxo-caixa/relatorio-geral', [FluxoCaixaController::class, 'relatorioGeral'])->name('fluxo-caixa.relatorio-geral');
     Route::get('/fluxo-caixa/individualizado', [FluxoCaixaController::class, 'fluxoIndividualizado'])->name('fluxo-caixa.individualizado');
     Route::post('/fluxo-caixa/relatorio-individualizado', [FluxoCaixaController::class, 'relatorioIndividualizado'])->name('fluxo-caixa.relatorio-individualizado');
 

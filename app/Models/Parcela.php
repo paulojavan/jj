@@ -62,7 +62,7 @@ class Parcela extends Model
      */
     public function cliente(): BelongsTo
     {
-        return $this->belongsTo(cliente::class, 'id_cliente', 'id');
+        return $this->belongsTo(Cliente::class, 'id_cliente', 'id');
     }
 
     /**

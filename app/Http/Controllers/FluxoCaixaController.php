@@ -33,14 +33,24 @@ class FluxoCaixaController extends Controller
     /**
      * Processa e exibe relatório geral
      */
-    public function relatorioGeral(FluxoCaixaRequest $request)
+    public function relatorioGeral(Request $request)
     {
         $user = Auth::user();
         $permiteEscolherPeriodo = $this->usuarioPermiteEscolherPeriodo($user);
         
         try {
-            // Obter dados validados com defaults aplicados
-            $dadosValidados = $request->validatedWithDefaults();
+            // Para requisições GET sem parâmetros, usar defaults
+            if ($request->isMethod('GET') && !$request->has(['data_inicio', 'data_fim'])) {
+                $hoje = now()->format('Y-m-d');
+                $dadosValidados = [
+                    'data_inicio' => $hoje,
+                    'data_fim' => $hoje
+                ];
+            } else {
+                // Validar dados para POST ou GET com parâmetros
+                $fluxoCaixaRequest = app(FluxoCaixaRequest::class);
+                $dadosValidados = $fluxoCaixaRequest->validatedWithDefaults();
+            }
             
             Log::info('Gerando relatório geral de fluxo de caixa', [
                 'usuario' => $user->id,

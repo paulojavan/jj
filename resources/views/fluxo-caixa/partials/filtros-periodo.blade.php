@@ -34,25 +34,7 @@
             </div>
         </div>
         
-        <!-- Botões de período rápido -->
-        <div class="flex flex-wrap gap-2 mt-4">
-            <button type="button" onclick="setPeriodo('hoje')" 
-                    class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-sm transition-colors">
-                Hoje
-            </button>
-            <button type="button" onclick="setPeriodo('ontem')" 
-                    class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-sm transition-colors">
-                Ontem
-            </button>
-            <button type="button" onclick="setPeriodo('semana')" 
-                    class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-sm transition-colors">
-                Esta Semana
-            </button>
-            <button type="button" onclick="setPeriodo('mes')" 
-                    class="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-sm transition-colors">
-                Este Mês
-            </button>
-        </div>
+
     @else
         <!-- Informação para Vendedor -->
         <div class="text-center">
@@ -67,36 +49,3 @@
         </div>
     @endif
 </form>
-
-@if($permiteEscolherPeriodo ?? false)
-<script>
-function setPeriodo(tipo) {
-    const hoje = new Date();
-    let dataInicio, dataFim;
-    
-    switch(tipo) {
-        case 'hoje':
-            dataInicio = dataFim = hoje;
-            break;
-        case 'ontem':
-            dataInicio = dataFim = new Date(hoje.getTime() - 24 * 60 * 60 * 1000);
-            break;
-        case 'semana':
-            const inicioSemana = new Date(hoje);
-            inicioSemana.setDate(hoje.getDate() - hoje.getDay());
-            dataInicio = inicioSemana;
-            dataFim = hoje;
-            break;
-        case 'mes':
-            dataInicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-            dataFim = hoje;
-            break;
-    }
-    
-    document.getElementById('data_inicio').value = dataInicio.toISOString().split('T')[0];
-    document.getElementById('data_fim').value = dataFim.toISOString().split('T')[0];
-    
-    document.getElementById('form-filtros').submit();
-}
-</script>
-@endif

@@ -156,12 +156,7 @@ class FluxoCaixaService
      */
     private function obterVendedoresCidade($cidadeId, $usuario, $nomeCidade, $dataInicio, $dataFim)
     {
-        // Se não for administrador, mostra apenas o próprio usuário
-        if ($usuario->nivel !== 'administrador') {
-            return User::where('id', $usuario->id)->get();
-        }
-
-        // Para administradores, buscar vendedores que tenham vendas ou recebimentos na cidade no período
+        // Buscar vendedores que tenham vendas ou recebimentos na cidade no período
         $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
         
         // Buscar IDs de vendedores que fizeram vendas
@@ -248,15 +243,70 @@ class FluxoCaixaService
         $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
         
         return $this->executarConsultaSegura(function() use ($tabelaVendas, $vendedorId, $dataInicio, $dataFim) {
-            return Parcela::where('id_vendedor', $vendedorId)
+            $parcelas = Parcela::with('cliente')
+                ->where('id_vendedor', $vendedorId)
                 ->where('bd', $tabelaVendas)
                 ->whereBetween('data_pagamento', [$dataInicio, $dataFim])
                 ->whereNotNull('data_pagamento')
-                ->orderBy('metodo')
                 ->orderBy('data_pagamento')
                 ->orderBy('hora')
-                ->get()
-                ->toArray();
+                ->orderBy(function($query) {
+                    $query->select('nome')
+                        ->from('clientes')
+                        ->whereColumn('clientes.id', 'parcelas.id_cliente')
+                        ->limit(1);
+                })
+                ->get();
+
+            // Agrupar por data e cliente
+            $agrupados = [];
+            foreach ($parcelas as $parcela) {
+                $data = $parcela->data_pagamento;
+                $clienteId = $parcela->id_cliente;
+                $nomeCliente = $parcela->cliente ? $parcela->cliente->nome : 'Cliente não encontrado';
+                
+                $chave = $data . '_' . $clienteId;
+                
+                if (!isset($agrupados[$chave])) {
+                    $agrupados[$chave] = [
+                        'data_pagamento' => $data,
+                        'cliente_id' => $clienteId,
+                        'cliente_nome' => $nomeCliente,
+                        'total_dinheiro' => 0,
+                        'total_pix' => 0,
+                        'total_cartao' => 0,
+                        'total_geral' => 0,
+                        'parcelas' => []
+                    ];
+                }
+                
+                // Somar valores
+                $agrupados[$chave]['total_dinheiro'] += $parcela->dinheiro ?? 0;
+                $agrupados[$chave]['total_pix'] += $parcela->pix ?? 0;
+                $agrupados[$chave]['total_cartao'] += $parcela->cartao ?? 0;
+                $agrupados[$chave]['total_geral'] += $parcela->valor_parcela ?? 0;
+                
+                // Adicionar parcela aos detalhes
+                $agrupados[$chave]['parcelas'][] = [
+                    'id' => $parcela->id,
+                    'valor_parcela' => $parcela->valor_parcela,
+                    'dinheiro' => $parcela->dinheiro ?? 0,
+                    'pix' => $parcela->pix ?? 0,
+                    'cartao' => $parcela->cartao ?? 0,
+                    'hora' => $parcela->hora,
+                    'data_pagamento' => $parcela->data_pagamento
+                ];
+            }
+            
+            // Ordenar por data e nome do cliente
+            uasort($agrupados, function($a, $b) {
+                if ($a['data_pagamento'] === $b['data_pagamento']) {
+                    return strcmp($a['cliente_nome'], $b['cliente_nome']);
+                }
+                return strcmp($a['data_pagamento'], $b['data_pagamento']);
+            });
+            
+            return array_values($agrupados);
         }, "Consulta recebimentos vendedor {$vendedorId} em {$nomeCidade}");
     }
 
@@ -338,10 +388,10 @@ class FluxoCaixaService
         ];
 
         foreach ($recebimentos as $recebimento) {
-            // Tratar tanto objetos quanto arrays
-            $dinheiro = is_object($recebimento) ? ($recebimento->dinheiro ?? 0) : ($recebimento['dinheiro'] ?? 0);
-            $pix = is_object($recebimento) ? ($recebimento->pix ?? 0) : ($recebimento['pix'] ?? 0);
-            $cartao = is_object($recebimento) ? ($recebimento->cartao ?? 0) : ($recebimento['cartao'] ?? 0);
+            // Tratar tanto objetos quanto arrays - agora usando os campos corretos dos dados agrupados
+            $dinheiro = is_object($recebimento) ? ($recebimento->total_dinheiro ?? 0) : ($recebimento['total_dinheiro'] ?? 0);
+            $pix = is_object($recebimento) ? ($recebimento->total_pix ?? 0) : ($recebimento['total_pix'] ?? 0);
+            $cartao = is_object($recebimento) ? ($recebimento->total_cartao ?? 0) : ($recebimento['total_cartao'] ?? 0);
 
             $resumo['total_dinheiro'] += $dinheiro;
             $resumo['total_pix'] += $pix;

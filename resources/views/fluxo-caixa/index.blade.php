@@ -43,18 +43,6 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-submit do formulário quando as datas mudarem (apenas para administradores)
-    @if($permiteEscolherPeriodo ?? false)
-    const dataInputs = document.querySelectorAll('input[type="date"]');
-    dataInputs.forEach(input => {
-        input.addEventListener('change', function() {
-            // Pequeno delay para permitir que o usuário termine de selecionar ambas as datas
-            setTimeout(() => {
-                document.getElementById('form-filtros').submit();
-            }, 500);
-        });
-    });
-    @endif
 
     // Mostrar/ocultar detalhes dos vendedores
     document.querySelectorAll('.toggle-vendedor').forEach(button => {
