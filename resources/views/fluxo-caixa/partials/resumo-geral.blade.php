@@ -53,7 +53,7 @@
                 </div>
                 <div class="flex justify-between border-t border-white border-opacity-30 pt-1 mt-2">
                     <span class="font-semibold text-white">Total:</span>
-                    <span class="font-bold text-green-200">R$ {{ number_format($resumo['recebimentos']['total_dinheiro_completo'], 2, ',', '.') }}</span>
+                    <span class="font-bold text-green-200">R$ {{ number_format($resumo['recebimentos']['total_geral'], 2, ',', '.') }}</span>
                 </div>
             </div>
         </div>

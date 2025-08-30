@@ -90,7 +90,7 @@
         
         <!-- Botões de ação -->
         <div class="flex justify-end space-x-4">
-            <x-button variant="secondary" type="button" onclick="window.history.back()">
+            <x-button variant="danger" type="button" onclick="window.history.back()">
                 Cancelar
             </x-button>
             <x-button variant="primary" type="submit" icon="fas fa-save">
@@ -154,12 +154,16 @@ document.getElementById('quantidade').addEventListener('change', function() {
     for (let i = 1; i <= quantidade; i++) {
         container.innerHTML += `
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Parcela ${i} - Data</label>
-                <input type="date" name="datas[]" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-calendar-alt mr-2 text-blue-500"></i>Parcela ${i} - Data
+                </label>
+                <input type="date" name="datas[]" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm" required>
             </div>
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Parcela ${i} - Valor</label>
-                <input type="text" name="valores[]" class="valor-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" required>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-dollar-sign mr-2 text-green-500"></i>Parcela ${i} - Valor
+                </label>
+                <input type="text" name="valores[]" class="valor-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white shadow-sm" placeholder="R$ 0,00" required>
             </div>
         `;
     }

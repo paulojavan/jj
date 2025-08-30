@@ -280,7 +280,7 @@ function cancelarPagamento(clienteId, pagamentoId) {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
+        cancelButtonColor: '#dc2626',
         confirmButtonText: 'Sim, cancelar!',
         cancelButtonText: 'Não, manter'
     }).then((result) => {

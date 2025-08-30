@@ -32,7 +32,7 @@
         />
         
         <div class="flex justify-end space-x-3">
-            <x-button variant="secondary" href="{{ route('grupos.index') }}">
+            <x-button variant="danger" href="{{ route('grupos.index') }}">
                 Cancelar
             </x-button>
             <x-button type="submit" variant="success">

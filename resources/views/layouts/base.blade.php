@@ -361,35 +361,35 @@
 
                 // Dropdowns do menu mobile
                 const mobileDropdowns = document.querySelectorAll('#mobile-menu .relative.group');
-                
+
                 mobileDropdowns.forEach((dropdown) => {
                     const button = dropdown.querySelector('button');
                     const menu = dropdown.querySelector('div');
                     // Seleciona apenas o ícone de dropdown (último i com classe fa-chevron-down)
                     const dropdownIcon = button ? button.querySelector('i.fa-chevron-down') : null;
-                    
+
                     if (button && menu && dropdownIcon) {
                         // Adiciona classe para identificar dropdowns no mobile
                         dropdown.classList.add('mobile-dropdown');
-                        
+
                         button.addEventListener('click', function(e) {
                             e.preventDefault();
                             e.stopPropagation();
-                            
+
                             // Verifica se o menu está visível
                             const isHidden = menu.classList.contains('hidden');
-                            
+
                             // Fecha todos os dropdowns
                             document.querySelectorAll('#mobile-menu .relative.group div').forEach((el) => {
                                 el.classList.add('hidden');
                             });
-                            
+
                             // Muda todos os ícones de dropdown para chevron-down
                             document.querySelectorAll('#mobile-menu .relative.group button i.fa-chevron-down, #mobile-menu .relative.group button i.fa-chevron-up').forEach((el) => {
                                 el.classList.remove('fa-chevron-up');
                                 el.classList.add('fa-chevron-down');
                             });
-                            
+
                             // Se o menu estava oculto, mostra ele e muda o ícone
                             if (isHidden) {
                                 menu.classList.remove('hidden');

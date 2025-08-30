@@ -110,7 +110,7 @@
                 </a>
             </div>
 
-            
+
 
         </div>
     </div>
@@ -204,8 +204,7 @@
 
     </div>
 
-    @if(Auth::check() && Auth::user()->nivel === 'administrador')
-    <!-- Seção Administrativo -->
+
     <div class="mb-8">
         <div class="flex items-center mb-4">
             <i class="fas fa-shield-alt text-red-600 text-2xl mr-3"></i>
@@ -253,7 +252,7 @@
             </div>
         </div>
     </div>
-    @endif
+
 
     <!-- Seção Configurações -->
     <div class="mb-8">

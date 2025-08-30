@@ -53,3 +53,16 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    function confirmDelete(id) {
+        JJAlert.delete('Excluir Marca?', 'Esta ação não pode ser desfeita e a marca será removida permanentemente.')
+            .then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById(`delete-form-${id}`).submit();
+                }
+            });
+    }
+</script>
+@endpush

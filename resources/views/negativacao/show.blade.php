@@ -293,7 +293,7 @@
                     </button>
                 </form>
                 <button onclick="fecharModal()" 
-                        class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                        class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
                     Cancelar
                 </button>
             </div>

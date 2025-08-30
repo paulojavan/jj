@@ -53,3 +53,20 @@
     </div>
 
 @endsection
+
+@push('scripts')
+<script>
+function confirmDelete(id) {
+    JJAlert.delete({
+        title: 'Tem certeza?',
+        text: 'Esta ação não pode ser desfeita!',
+        confirmButtonText: 'Sim, excluir!',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('delete-form-' + id).submit();
+        }
+    });
+}
+</script>
+@endpush

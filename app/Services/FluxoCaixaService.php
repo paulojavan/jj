@@ -247,17 +247,59 @@ class FluxoCaixaService
     {
         $tabelaVendas = TabelaDinamica::vendas($nomeCidade);
         
-        return $this->executarConsultaSegura(function() use ($tabelaVendas, $vendedorId, $dataInicio, $dataFim) {
-            return Parcela::where('id_vendedor', $vendedorId)
-                ->where('bd', $tabelaVendas)
-                ->whereBetween('data_pagamento', [$dataInicio, $dataFim])
-                ->whereNotNull('data_pagamento')
-                ->orderBy('metodo')
-                ->orderBy('data_pagamento')
-                ->orderBy('hora')
+        $parcelas = $this->executarConsultaSegura(function() use ($tabelaVendas, $vendedorId, $dataInicio, $dataFim) {
+            return Parcela::where('parcelas.id_vendedor', $vendedorId)
+                ->where('parcelas.bd', $tabelaVendas)
+                ->whereBetween('parcelas.data_pagamento', [$dataInicio, $dataFim])
+                ->whereNotNull('parcelas.data_pagamento')
+                ->leftJoin('clientes', 'parcelas.id_cliente', '=', 'clientes.id')
+                ->select('parcelas.*', 'clientes.nome as cliente_nome')
+                ->orderBy('parcelas.metodo')
+                ->orderBy('parcelas.data_pagamento')
+                ->orderBy('parcelas.hora')
                 ->get()
                 ->toArray();
         }, "Consulta recebimentos vendedor {$vendedorId} em {$nomeCidade}");
+        
+        // Agrupar parcelas por data e cliente para a estrutura esperada pela view
+        return $this->agruparRecebimentosPorCliente($parcelas);
+    }
+
+    /**
+     * Agrupa recebimentos por cliente e data para a estrutura esperada pela view
+     */
+    private function agruparRecebimentosPorCliente($parcelas)
+    {
+        $recebimentosAgrupados = [];
+        
+        // Agrupar por data_pagamento e cliente_nome
+        $grupos = [];
+        foreach ($parcelas as $parcela) {
+            $chave = $parcela['data_pagamento'] . '_' . ($parcela['cliente_nome'] ?? 'Cliente não identificado');
+            if (!isset($grupos[$chave])) {
+                $grupos[$chave] = [
+                    'data_pagamento' => $parcela['data_pagamento'],
+                    'cliente_nome' => $parcela['cliente_nome'] ?? 'Cliente não identificado',
+                    'parcelas' => [],
+                    'total_dinheiro' => 0,
+                    'total_pix' => 0,
+                    'total_cartao' => 0,
+                    'total_geral' => 0
+                ];
+            }
+            
+            // Adicionar parcela ao grupo
+            $grupos[$chave]['parcelas'][] = $parcela;
+            
+            // Somar totais
+            $grupos[$chave]['total_dinheiro'] += floatval($parcela['dinheiro'] ?? 0);
+            $grupos[$chave]['total_pix'] += floatval($parcela['pix'] ?? 0);
+            $grupos[$chave]['total_cartao'] += floatval($parcela['cartao'] ?? 0);
+            $grupos[$chave]['total_geral'] += floatval($parcela['valor_parcela'] ?? 0);
+        }
+        
+        // Converter para array indexado
+        return array_values($grupos);
     }
 
     /**
@@ -338,10 +380,10 @@ class FluxoCaixaService
         ];
 
         foreach ($recebimentos as $recebimento) {
-            // Tratar tanto objetos quanto arrays
-            $dinheiro = is_object($recebimento) ? ($recebimento->dinheiro ?? 0) : ($recebimento['dinheiro'] ?? 0);
-            $pix = is_object($recebimento) ? ($recebimento->pix ?? 0) : ($recebimento['pix'] ?? 0);
-            $cartao = is_object($recebimento) ? ($recebimento->cartao ?? 0) : ($recebimento['cartao'] ?? 0);
+            // Os recebimentos já vêm agrupados com totais calculados
+            $dinheiro = is_object($recebimento) ? ($recebimento->total_dinheiro ?? 0) : ($recebimento['total_dinheiro'] ?? 0);
+            $pix = is_object($recebimento) ? ($recebimento->total_pix ?? 0) : ($recebimento['total_pix'] ?? 0);
+            $cartao = is_object($recebimento) ? ($recebimento->total_cartao ?? 0) : ($recebimento['total_cartao'] ?? 0);
 
             $resumo['total_dinheiro'] += $dinheiro;
             $resumo['total_pix'] += $pix;
@@ -393,8 +435,11 @@ class FluxoCaixaService
         }
 
         // Calcula totais
-        $resumo['vendas']['total_geral'] = array_sum($resumo['vendas']);
-        $resumo['recebimentos']['total_geral'] = array_sum($resumo['recebimentos']);
+        $resumo['vendas']['total_geral'] = $resumo['vendas']['total_dinheiro'] + $resumo['vendas']['total_pix'] + 
+                                          $resumo['vendas']['total_cartao'] + $resumo['vendas']['total_crediario'];
+        $resumo['recebimentos']['total_geral'] = $resumo['recebimentos']['total_dinheiro'] + 
+                                               $resumo['recebimentos']['total_pix'] + 
+                                               $resumo['recebimentos']['total_cartao'];
 
         // Soma despesas
         foreach ($despesas as $despesa) {
@@ -453,10 +498,20 @@ class FluxoCaixaService
             $resumoGeral['despesas']['total'] += $resumoCidade['despesas']['total'];
         }
 
-        $resumoGeral['vendas']['total_geral'] = array_sum($resumoGeral['vendas']);
-        $resumoGeral['recebimentos']['total_geral'] = array_sum($resumoGeral['recebimentos']);
+        $resumoGeral['vendas']['total_geral'] = $resumoGeral['vendas']['total_dinheiro'] + 
+                                              $resumoGeral['vendas']['total_pix'] + 
+                                              $resumoGeral['vendas']['total_cartao'] + 
+                                              $resumoGeral['vendas']['total_crediario'];
+        $resumoGeral['recebimentos']['total_geral'] = $resumoGeral['recebimentos']['total_dinheiro'] + 
+                                                    $resumoGeral['recebimentos']['total_pix'] + 
+                                                    $resumoGeral['recebimentos']['total_cartao'];
+        
+        // Calcula total de dinheiro (vendas à vista + recebimentos de parcelas)
+        $resumoGeral['recebimentos']['total_dinheiro_completo'] =
+            $resumoGeral['vendas']['total_dinheiro'] + $resumoGeral['recebimentos']['total_dinheiro'];
+        
         $resumoGeral['recebimentos']['total_dinheiro_liquido'] =
-            $resumoGeral['recebimentos']['total_dinheiro'] - $resumoGeral['despesas']['total'];
+            $resumoGeral['recebimentos']['total_dinheiro_completo'] - $resumoGeral['despesas']['total'];
 
         return $resumoGeral;
     }

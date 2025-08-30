@@ -170,7 +170,12 @@ window.JJAlert = {
             confirmButtonText: '<i class="fas fa-trash mr-2"></i>Sim, excluir!',
             cancelButtonText: '<i class="fas fa-times mr-2"></i>Cancelar',
             reverseButtons: true,
-            ...defaultSwalConfig
+            customClass: {
+                ...defaultSwalConfig.customClass,
+                confirmButton: 'swal2-confirm-error',
+                cancelButton: 'swal2-cancel-error'
+            },
+            buttonsStyling: false
         });
     },
     

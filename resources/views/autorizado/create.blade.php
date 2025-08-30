@@ -68,14 +68,14 @@
             />
         </div>
         
-        <div class="flex justify-end space-x-3">
-            <a href="{{ route('clientes.edit', request()->route('cliente_id')) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                Cancelar
-            </a>
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        <x-slot name="actions">
+            <x-button type="submit" variant="primary" icon="fas fa-save">
                 Cadastrar Pessoa Autorizada
-            </button>
-        </div>
+            </x-button>
+            <x-button variant="danger" href="{{ route('clientes.edit', request()->route('cliente_id')) }}" icon="fas fa-times">
+                Cancelar
+            </x-button>
+        </x-slot>
     </x-form>
 
 </div>

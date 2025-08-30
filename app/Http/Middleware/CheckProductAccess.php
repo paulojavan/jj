@@ -20,7 +20,7 @@ class CheckProductAccess
         $user = Auth::user();
 
         // Verifica se o usuário está autenticado e se é administrador ou tem permissão para cadastro de produtos
-        if ($user && ($user->nivel === 'administrador' || $user->cadastro_produtos === true)) {
+        if ($user && ($user->nivel === 'administrador' || $user->cadastro_produtos)) {
             return $next($request);
         }
 

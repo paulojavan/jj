@@ -2,9 +2,9 @@
 @section('content')
 
 <div class="content">
-    <x-page-header 
-        title="Editar Marca" 
-        subtitle="Atualize as informações da marca" 
+    <x-page-header
+        title="Editar Marca"
+        subtitle="Atualize as informações da marca"
         icon="fas fa-edit">
         <x-slot name="actions">
             <x-button variant="secondary" icon="fas fa-list" href="{{ route('marcas.index') }}">
@@ -15,24 +15,25 @@
 
     <x-alert />
 
-    <x-form 
-        title="Dados da Marca" 
-        subtitle="Atualize as informações da marca" 
-        action="{{ route('marcas.update', $marca) }}" 
-        method="PUT"
+    <x-form
+        title="Dados da Marca"
+        subtitle="Atualize as informações da marca"
+        action="{{ route('marcas.update', $marca) }}"
+        method="POST"
     >
-        <x-input 
-            label="Nome da Marca" 
-            name="marca" 
-            type="text" 
-            placeholder="Nome da marca" 
-            :value="$marca->marca ?? old('marca')" 
-            icon="fas fa-tags" 
-            required="true" 
+        @method('PUT')
+        <x-input
+            label="Nome da Marca"
+            name="marca"
+            type="text"
+            placeholder="Nome da marca"
+            :value="$marca->marca ?? old('marca')"
+            icon="fas fa-tags"
+            required="true"
         />
-        
+
         <div class="flex justify-end space-x-3">
-            <x-button variant="secondary" href="{{ route('marcas.index') }}">
+            <x-button variant="danger" href="{{ route('marcas.index') }}">
                 Cancelar
             </x-button>
             <x-button type="submit" variant="success">

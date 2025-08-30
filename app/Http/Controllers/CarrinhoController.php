@@ -1423,11 +1423,11 @@ class CarrinhoController extends Controller
 
         for ($i = 0; $i < $numberOfInstallments; $i++) {
             if ($i > 0) {
-                // Adiciona um mês preservando o dia
+                // Adiciona um mês preservando o dia sem overflow
                 if ($dayType === 'ultimo') {
-                    $currentDate = $currentDate->copy()->addMonth()->endOfMonth();
+                    $currentDate = $currentDate->copy()->addMonthsNoOverflow(1)->endOfMonth();
                 } else {
-                    $currentDate = $currentDate->copy()->addMonth();
+                    $currentDate = $currentDate->copy()->addMonthsNoOverflow(1);
                 }
             }
 
@@ -1609,7 +1609,7 @@ class CarrinhoController extends Controller
      */
     private function getFirstPaymentDate($dayType)
     {
-        $nextMonth = now()->addMonth();
+        $nextMonth = now()->addMonthsNoOverflow(1);
 
         switch ($dayType) {
             case '10':
@@ -1619,7 +1619,7 @@ class CarrinhoController extends Controller
             case 'ultimo':
                 return $nextMonth->endOfMonth()->toDateString();
             case '10_next':
-                return $nextMonth->addMonth()->day(10)->toDateString();
+                return $nextMonth->addMonthsNoOverflow(1)->day(10)->toDateString();
             default:
                 return $nextMonth->day(10)->toDateString();
         }

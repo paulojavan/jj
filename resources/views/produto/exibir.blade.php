@@ -220,7 +220,7 @@ function processReturn(saleId) {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
+                cancelButtonColor: '#dc2626',
                 confirmButtonText: 'Sim, devolver',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true
@@ -250,7 +250,7 @@ function processReturn(saleId) {
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#6b7280',
+                cancelButtonColor: '#dc2626',
                 confirmButtonText: 'Sim, devolver',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true

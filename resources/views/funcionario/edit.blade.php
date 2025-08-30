@@ -19,9 +19,10 @@
         title="Dados do Funcionário" 
         subtitle="Atualize as informações do funcionário" 
         action="{{ route('funcionario.update', ['id' => $funcionario->id]) }}" 
-        method="PUT"
+        method="POST"
         enctype="multipart/form-data"
     >
+        @method('PUT')
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-input 
                 label="Nome" 
@@ -95,60 +96,55 @@
             @endif
         </div>
 
-        <x-form-section title="Permissões do Sistema" subtitle="Configure as permissões de acesso do funcionário">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <x-input 
-                    label="Cadastro de Produtos" 
-                    name="cadastro_produtos" 
-                    type="checkbox" 
-                    value="1" 
-                    :checked="$funcionario->cadastro_produtos == '1'" 
-                    help="Permite cadastrar e editar produtos"
-                />
+        <!-- Seção: Permissões -->
+        <div class="mb-8">
+            <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center">
+                <i class="fas fa-shield-alt mr-2"></i>Permissões do Sistema
+            </h3>
+            <div class="h-0.5 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full mb-6"></div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-4">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input name="cadastro_produtos" type="checkbox" value="1" {{ $funcionario->cadastro_produtos == '1' ? 'checked' : '' }} class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-lime-600"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-900">Cadastro de produtos</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input name="ajuste_estoque" type="checkbox" value="1" {{ $funcionario->ajuste_estoque == '1' ? 'checked' : '' }} class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-lime-600"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-900">Ajuste de estoque</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input name="recebimentos" type="checkbox" value="1" {{ $funcionario->recebimentos == '1' ? 'checked' : '' }} class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-lime-600"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-900">Recebimentos</span>
+                    </label>
+                </div>
                 
-                <x-input 
-                    label="Ajuste de Estoque" 
-                    name="ajuste_estoque" 
-                    type="checkbox" 
-                    value="1" 
-                    :checked="$funcionario->ajuste_estoque == '1'" 
-                    help="Permite ajustar quantidades em estoque"
-                />
-                
-                <x-input 
-                    label="Vendas no Crediário" 
-                    name="vendas_crediario" 
-                    type="checkbox" 
-                    value="1" 
-                    :checked="$funcionario->vendas_crediario == '1'" 
-                    help="Permite realizar vendas a prazo"
-                />
-                
-                <x-input 
-                    label="Ajuste de Limite" 
-                    name="limite" 
-                    type="checkbox" 
-                    value="1" 
-                    :checked="$funcionario->limite == '1'" 
-                    help="Permite alterar limites de crédito"
-                />
-                
-                <x-input 
-                    label="Recebimentos" 
-                    name="recebimentos" 
-                    type="checkbox" 
-                    value="1" 
-                    :checked="$funcionario->recebimentos == '1'" 
-                    help="Permite registrar recebimentos"
-                />
+                <div class="space-y-4">
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input name="vendas_crediario" type="checkbox" value="1" {{ $funcionario->vendas_crediario == '1' ? 'checked' : '' }} class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-lime-600"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-900">Vendas no crediário</span>
+                    </label>
+                    
+                    <label class="inline-flex items-center cursor-pointer">
+                        <input name="limite" type="checkbox" value="1" {{ $funcionario->limite == '1' ? 'checked' : '' }} class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-lime-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all peer-checked:bg-lime-600"></div>
+                        <span class="ms-3 text-sm font-medium text-gray-900">Ajuste de limite</span>
+                    </label>
+                </div>
             </div>
-        </x-form-section>
+        </div>
 
         <x-slot name="actions">
             <x-button type="submit" variant="primary" icon="fas fa-save">
                 Atualizar Funcionário
             </x-button>
-            <x-button variant="secondary" href="{{ route('funcionario.index') }}" icon="fas fa-times">
+            <x-button variant="danger" href="{{ route('funcionario.index') }}" icon="fas fa-times">
                 Cancelar
             </x-button>
         </x-slot>

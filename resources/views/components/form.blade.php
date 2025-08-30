@@ -27,5 +27,11 @@
         @endif
         
         {{ $slot }}
+        
+        @isset($actions)
+            <div class="flex justify-center space-x-3 mt-6 pt-6 border-t border-gray-200">
+                {{ $actions }}
+            </div>
+        @endisset
     </form>
 </div>

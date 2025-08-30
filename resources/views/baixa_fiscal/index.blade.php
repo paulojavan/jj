@@ -59,7 +59,7 @@
         <h3 class="text-lg font-semibold mb-4">Confirmar Baixa Fiscal</h3>
         <p class="mb-6">Tem certeza que deseja dar baixa fiscal no produto <span id="codigoProduto"></span>?</p>
         <div class="flex justify-end space-x-3">
-            <button id="cancelBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+            <button id="cancelBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
                 Cancelar
             </button>
             <button id="confirmBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

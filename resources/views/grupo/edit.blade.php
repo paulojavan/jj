@@ -19,8 +19,9 @@
         title="Dados do Grupo" 
         subtitle="Atualize as informações do grupo" 
         action="{{ route('grupos.update', $grupo->id) }}" 
-        method="PUT"
+        method="POST"
     >
+        @method('PUT')
         <x-input 
             label="Nome do Grupo" 
             name="grupo" 
@@ -32,7 +33,7 @@
         />
         
         <div class="flex justify-end space-x-3">
-            <x-button variant="secondary" href="{{ route('grupos.index') }}">
+            <x-button variant="danger" href="{{ route('grupos.index') }}">
                 Cancelar
             </x-button>
             <x-button type="submit" variant="success">

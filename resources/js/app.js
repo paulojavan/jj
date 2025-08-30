@@ -8,7 +8,7 @@ window.cofirmDelete = function (id) {
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
+        cancelButtonColor: "#dc2626",
         confirmButtonText: "Sim,excluir!",
         cancelButtonText: "Cancelar",
       }).then((result) => {

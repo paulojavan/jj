@@ -52,9 +52,10 @@
             title="Dados do Cliente"
             subtitle="Atualize as informações pessoais do cliente"
             action="{{ route('clientes.update', ['cliente' => $cliente->id]) }}"
-            method="PUT"
+            method="POST"
             enctype="multipart/form-data"
         >
+            @method('PUT')
             <x-form-section title="Dados Pessoais" subtitle="Informações básicas do cliente">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <x-input
@@ -451,7 +452,7 @@
                 <x-button type="submit" variant="primary" icon="fas fa-save">
                     Atualizar Informações
                 </x-button>
-                <x-button variant="secondary" href="{{ route('clientes.index') }}" icon="fas fa-times">
+                <x-button variant="danger" href="{{ route('clientes.index') }}" icon="fas fa-times">
                     Cancelar
                 </x-button>
             </x-slot>

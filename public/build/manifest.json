@@ -1,17 +1,17 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app--9tWBFQc.css",
+    "file": "assets/app-BCSQGKqv.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BSzPpa-f.js",
+    "file": "assets/app-DeBiQo4q.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true
   },
   "resources/js/sweetalert-config.js": {
-    "file": "assets/sweetalert-config-DnbMTx4e.js",
+    "file": "assets/sweetalert-config-B_w_CGpc.js",
     "name": "sweetalert-config",
     "src": "resources/js/sweetalert-config.js",
     "isEntry": true

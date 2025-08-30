@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class AdminMiddleware
+class CheckFuncionarioAccess
 {
     /**
      * Handle an incoming request.
@@ -20,7 +20,7 @@ class AdminMiddleware
 
         // Verifica se o usuário está autenticado e se é administrador
         if (!$user || $user->nivel !== 'administrador') {
-            return redirect()->route('dashboard')->with('error', 'Acesso negado. Apenas administradores podem acessar esta funcionalidade.');
+            return redirect()->route('dashboard')->with('error', 'Você não tem permissão para acessar o gerenciamento de funcionários. Apenas administradores podem acessar esta área.');
         }
 
         return $next($request);

@@ -146,7 +146,7 @@
 
         <!-- Botões de Ação -->
         <div class="flex justify-center gap-4">
-            <x-button variant="secondary" icon="fas fa-times" href="{{ route('produtos.index') }}">
+            <x-button variant="danger" icon="fas fa-times" href="{{ route('produtos.index') }}">
                 Cancelar
             </x-button>
             <x-button type="submit" variant="success" icon="fas fa-save">

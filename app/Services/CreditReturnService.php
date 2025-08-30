@@ -193,34 +193,44 @@ class CreditReturnService
             throw new Exception('Uma ou mais tabelas não existem');
         }
 
-        // Buscar produtos vendidos
+        // Buscar produtos vendidos com suas numerações específicas
         $vendas = DB::table($tabelaVendas)
             ->where('ticket', $ticketNumber)
-            ->select('id_produto', DB::raw('COUNT(*) as quantidade'))
-            ->groupBy('id_produto')
+            ->select('id_produto', 'numeracao', DB::raw('COUNT(*) as quantidade'))
+            ->groupBy('id_produto', 'numeracao')
             ->get();
 
         if ($vendas->isEmpty()) {
             throw new Exception('Nenhuma venda encontrada para o ticket');
         }
 
-        // Atualizar estoque para cada produto
+        // Atualizar estoque para cada produto e numeração específica
         foreach ($vendas as $venda) {
-            $updated = DB::table($tabelaEstoque)
+            // Verificar se já existe registro para esta numeração
+            $estoqueExistente = DB::table($tabelaEstoque)
                 ->where('id_produto', $venda->id_produto)
-                ->increment('quantidade', $venda->quantidade);
+                ->where('numero', $venda->numeracao)
+                ->first();
 
-            if (!$updated) {
-                // Se o produto não existe no estoque, criar registro
+            if ($estoqueExistente) {
+                // Atualizar estoque existente
+                DB::table($tabelaEstoque)
+                    ->where('id_produto', $venda->id_produto)
+                    ->where('numero', $venda->numeracao)
+                    ->increment('quantidade', $venda->quantidade);
+            } else {
+                // Criar novo registro de estoque para esta numeração
                 DB::table($tabelaEstoque)->insert([
                     'id_produto' => $venda->id_produto,
+                    'numero' => $venda->numeracao,
                     'quantidade' => $venda->quantidade
                 ]);
             }
 
-            Log::info('Estoque atualizado', [
+            Log::info('Estoque atualizado por numeração', [
                 'ticket' => $ticketNumber,
                 'produto_id' => $venda->id_produto,
+                'numeracao' => $venda->numeracao,
                 'quantidade_devolvida' => $venda->quantidade,
                 'tabela_estoque' => $tabelaEstoque
             ]);
